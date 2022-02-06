@@ -1,24 +1,25 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useReducer } from "react";
+import "./App.css";
+import { AppState, appStateReducer } from "./AppState/appState";
+import { AppContext } from "./AppState/appStateContext";
+import { RenderPallet } from "./Pallet/Pallet";
+import { RenderTile } from "./Tile/Tile";
+import { defaultTile } from "./Tile/tile";
+
+export const defaultState: AppState = {
+  selectedTile: defaultTile,
+  selectedPixel: null,
+};
 
 function App() {
+  const [state, dispatch] = useReducer(appStateReducer, defaultState);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <AppContext.Provider value={{ dispatch }}>
+        <RenderTile tile={state.selectedTile} selectedPixel={state.selectedPixel} />
+        <RenderPallet pallet={state.selectedTile.pallet} />
+      </AppContext.Provider>
     </div>
   );
 }

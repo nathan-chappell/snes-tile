@@ -1,0 +1,27 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+.pixel {
+    margin: 0;
+    width: 32px;
+    height: 32px;
+    border: solid black 2px;
+}
+
+.selected-pixel {
+    margin: 0;
+    width: 32px;
+    height: 32px;
+    border: solid black 2px;
+    outline: solid gray 4px;
+}
+
+.tile {
+    border-collapse: collapse;
+}
+
+.tile-row {
+
+}
