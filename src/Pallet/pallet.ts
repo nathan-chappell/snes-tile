@@ -11,7 +11,7 @@ export const number2rgb = (c: number) => {
 }
 export const color2css = (color: Color) => '#' + color.reduce((acc: string, c: number) => acc + number2rgb(c), '');
 
-export const defaultPallet: Pallet = [
+export const makeDefaultPallet: () => Pallet = () => [
     [0, 0, 0],
     [32, 0, 0],
     [0, 32, 0],

@@ -1,4 +1,4 @@
-import { Pallet, defaultPallet } from "../Pallet/pallet"
+// import { Pallet, makeDefaultPallet } from "../Pallet/pallet"
 
 export type Pixel = number
 export type Size = [number, number]
@@ -6,10 +6,10 @@ export type Size = [number, number]
 export interface Tile {
     pixels: Pixel[][]
     size: [number, number]
-    palletName: string
+    palletIndex: number
 }
 
-export const defaultTile: Tile = {
+export const makeDefaultTile: () => Tile = () => ({
     pixels: [
         [1,1,1,1, 1,1,1,1],
         [2,2,2,2, 2,2,2,2],
@@ -22,15 +22,15 @@ export const defaultTile: Tile = {
         [3,1,3,1, 3,1,3,1],
     ],
     size: [8,8],
-    pallet: defaultPallet
-}
+    palletIndex: 0,
+});
 
-export const createTile: (size: Size, pallet: Pallet) => Tile =
-    (size = [8, 8], pallet = defaultPallet) => {
+export const createTile: (size: Size, palletIndex: number) => Tile =
+    (size = [8, 8], palletIndex = 0) => {
         const [width, height] = size;
         const pixels = Array<Array<number>>(height);
         for (let i = 0; i < height; ++i) {
             pixels[i] = Array<number>(width);
         }
-        return { pixels, size, pallet };
+        return { pixels, size, palletIndex };
     }

@@ -10,8 +10,8 @@ export interface PalletProps {
 export const RenderPallet = ({ pallet }: PalletProps) => {
   let { dispatch } = useContext(AppContext);
 
-  const updatePallet = (i: number, value: number) =>
-    dispatch!({ type: "update-pallet", payload: { i, value } });
+  const updatePallet = (colorIndex: number, rgbIndex: number, value: number) =>
+    dispatch!({ type: "update-pallet", payload: { colorIndex, rgbIndex, value } });
 
   return (
     <div className="Pallet">
@@ -21,15 +21,15 @@ export const RenderPallet = ({ pallet }: PalletProps) => {
             className="pallet-color-sample"
             style={{ background: color2css(color) }}
           />
-          {[...Array(3)].map((_, i) => (
+          {[...Array(3)].map((_, rgbIndex) => (
             <input
-              key={i}
+              key={rgbIndex}
               type="number"
               min="0"
               max="32"
               step="1"
-              value={color[i]}
-              onChange={(e) => updatePallet(i, e.target.valueAsNumber)}
+              value={color[rgbIndex]}
+              onChange={(e) => updatePallet(colorIndex, rgbIndex, e.target.valueAsNumber)}
             />
           ))}
         </div>
