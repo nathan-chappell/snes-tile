@@ -33,7 +33,14 @@ export interface SelectPixelAction {
     payload: SelectPixelPayload
 }
 
-export type Action = UpdatePalletAction | SelectPixelAction;
+export type SelectColorPayload = number;
+
+export interface SelectColorAction {
+    type: 'select-color'
+    payload: SelectColorPayload
+}
+
+export type Action = UpdatePalletAction | SelectPixelAction | SelectColorAction;
 
 const updatePallet = (pallet: Pallet, colorIndex: number, color: Color) =>
     [...pallet.slice(0, colorIndex), color, ...pallet.slice(colorIndex+1)];
