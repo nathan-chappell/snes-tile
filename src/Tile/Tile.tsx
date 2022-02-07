@@ -1,19 +1,19 @@
 import React, { useContext } from "react";
-import { Tile as TileT } from "./tileModel";
+import { TileModel } from "./tileModel";
 import "./tile.css";
 import { color2css } from "../Pallet/palletModel";
 import { AppContext } from "../AppState/appStateContext";
 import { debug } from "console";
 
 export interface TileProps {
-  tile: TileT;
+  tile: TileModel;
   selectedPixels: [number, number][] | null;
+  name: number;
 }
 
-export const Tile = ({ tile, selectedPixels }: TileProps) => {
+export const Tile = ({ tile, selectedPixels, name }: TileProps) => {
   console.log(tile);
   const { dispatch, getColor } = useContext(AppContext);
-  // let [selectedRow, selectedCol] = selectedPixels ?? [-1, -1];
 
   const getClassName = (rowIndex: number, colIndex: number) =>
     selectedPixels?.find(
@@ -24,7 +24,7 @@ export const Tile = ({ tile, selectedPixels }: TileProps) => {
       : "pixel";
 
   return (
-    <>
+    <div grid-area={`tile${name}`}>
       <table className="tile" tabIndex={2}>
         <tbody>
           {tile.pixels.map((row, rowIndex) => (
@@ -39,7 +39,7 @@ export const Tile = ({ tile, selectedPixels }: TileProps) => {
                   onClick={(e) =>
                     dispatch({
                       type: e.ctrlKey ? "select-another-pixel" : "select-pixel",
-                      payload: [[rowIndex, colIndex]],
+                      payload: { selectedPixels: [[rowIndex, colIndex]], name },
                     })
                   }
                 />
@@ -48,9 +48,6 @@ export const Tile = ({ tile, selectedPixels }: TileProps) => {
           ))}
         </tbody>
       </table>
-      <button onClick={() => dispatch({ type: "select-pixel", payload: null })} className="clear-selection">
-        Clear Selection
-      </button>
-    </>
+    </div>
   );
 };

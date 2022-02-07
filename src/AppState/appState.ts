@@ -1,67 +1,32 @@
 import { Color, Pallet } from "../Pallet/palletModel";
-import { Tile } from "../Tile/tileModel";
+import { SpriteSize } from "../Sprite/spriteModel";
+import { TileModel } from "../Tile/tileModel";
+import { Action } from "./actions";
 
 export interface AppState {
   pallets: Pallet[];
   selectedPalletIndex: number;
-  selectedPixels: [number, number][] | null;
-  selectedTileIndex: number;
-  tiles: Tile[];
+  selectedPixels: { [name: number]: [number, number][] | null };
+  name: number;
+  tiles: TileModel[];
+  spriteSize: SpriteSize;
 }
 
-// export interface Action {
-//     type: 'select-pixel' | 'update-pallet',
-//     payload: any
-// }
-
-export interface UpdatePalletPayload {
-  colorIndex: number;
-  rgbIndex: number;
-  value: number;
-}
-
-export interface UpdatePalletAction {
-  type: "update-pallet";
-  payload: UpdatePalletPayload;
-}
-
-export interface UpdatePalletColorPayload {
-  colorIndex: number;
-  value: Color;
-}
-
-export interface UpdatePalletColorAction {
-  type: "update-pallet-color";
-  payload: UpdatePalletColorPayload;
-}
-
-export type SelectPalletPayload = number;
-
-export interface SelectPalletAction {
-  type: "select-pallet";
-  payload: SelectPalletPayload;
-}
-
-export type SelectPixelPayload = [number, number][] | null;
-
-export interface SelectPixelAction {
-  type: "select-pixel" | "select-another-pixel";
-  payload: SelectPixelPayload;
-}
-
-export type SelectColorPayload = number;
-
-export interface SelectColorAction {
-  type: "select-color";
-  payload: SelectColorPayload;
-}
-
-export type Action =
-  | UpdatePalletAction
-  | UpdatePalletColorAction
-  | SelectPalletAction
-  | SelectPixelAction
-  | SelectColorAction;
+const getCurrentTiles: (state: AppState) => [number, TileModel][] = (state) => {
+  const [w, h] = state.spriteSize;
+  if (w === 8 && h === 8) {
+    return [[state.name, state.tiles[state.name]]];
+  } else if (w === 16 && h === 16) {
+    return [
+      [state.name, state.tiles[state.name]],
+      [state.name + 1, state.tiles[state.name + 1]],
+      [state.name + 16, state.tiles[state.name + 16]],
+      [state.name + 17, state.tiles[state.name + 17]],
+    ];
+  } else {
+    throw new Error("NotImplemented");
+  }
+};
 
 const updatePallet = (pallet: Pallet, colorIndex: number, color: Color) => [
   ...pallet.slice(0, colorIndex),
@@ -74,63 +39,84 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (
   action
 ) => {
   console.log("[appStateReducer] state: ", state, "action: ", action);
+
   switch (action.type) {
+    case "deselect-pixel":
+      return {
+        ...state,
+        selectedPixels: {},
+      };
+
     case "select-pixel":
-      return { ...state, selectedPixels: action.payload };
+      return {
+        ...state,
+        selectedPixels: {
+          ...state.selectedPixels,
+          [action.payload.name]: action.payload.selectedPixels,
+        },
+      };
+
     case "select-another-pixel":
       return {
         ...state,
-        selectedPixels: [
-          ...(state.selectedPixels ?? []),
-          ...(action.payload ?? []),
-        ],
+        selectedPixels: {
+          ...state.selectedPixels,
+          [action.payload.name]: [
+            ...(state.selectedPixels[action.payload.name] ?? []),
+            ...(action.payload.selectedPixels ?? []),
+          ],
+        },
       };
+
     case "select-pallet": {
-      const oldTile = state.tiles[state.selectedTileIndex];
-      let newPixels = [...oldTile.pixels.map((a) => [...a])];
-      state.selectedPixels?.forEach(([r, c]) => {
-        newPixels[r][c] = action.payload;
-      });
+      var newTiles: [number, TileModel][] = getCurrentTiles(state)?.map(
+        ([oldName, oldTile]) => {
+          let newPixels = [...oldTile.pixels.map((a) => [...a])];
+          state.selectedPixels[oldName]?.forEach(([r, c]) => {
+            newPixels[r][c] = action.payload;
+          });
+          return [oldName, { ...oldTile, pixels: newPixels }];
+        }
+      );
+      debugger;
       return {
         ...state,
-        tiles: [
-          ...state.tiles.slice(0, state.selectedTileIndex),
-          { ...oldTile, pixels: newPixels },
-          ...state.tiles.slice(state.selectedTileIndex + 1),
-        ],
+        tiles: newTiles.reduce(
+          (tilesAcc, [_name, newTile]) => ({ ...tilesAcc, [_name]: newTile }),
+          state.tiles
+        ),
       };
     }
+
     case "update-pallet": {
       const { colorIndex, rgbIndex, value } = action.payload;
-      const selectedPalletIndex =
-        state.tiles[state.selectedTileIndex].palletIndex;
+      const selectedPalletIndex = state.tiles[state.name].palletIndex;
       const selectedPallet = state.pallets[selectedPalletIndex];
       let newColor: Color = [...selectedPallet[colorIndex]];
       newColor[rgbIndex] = value;
       const newPallet = updatePallet(selectedPallet, colorIndex, newColor);
       return {
         ...state,
-        pallets: [
-          ...state.pallets.slice(0, selectedPalletIndex),
-          newPallet,
-          ...state.pallets.slice(selectedPalletIndex + 1),
-        ],
+        pallets: {
+          ...state.pallets,
+          [selectedPalletIndex]: newPallet,
+        },
       };
     }
+
     case "update-pallet-color":
       const { colorIndex, value } = action.payload;
-      const selectedPalletIndex =
-        state.tiles[state.selectedTileIndex].palletIndex;
+      const selectedPalletIndex = state.tiles[state.name].palletIndex;
       const selectedPallet = state.pallets[selectedPalletIndex];
       const newPallet = updatePallet(selectedPallet, colorIndex, value);
       return {
         ...state,
-        pallets: [
-          ...state.pallets.slice(0, selectedPalletIndex),
-          newPallet,
-          ...state.pallets.slice(selectedPalletIndex + 1),
-        ],
+        pallets: {
+          ...state.pallets,
+          [selectedPalletIndex]: newPallet,
+        },
       };
+
     default:
       throw new Error(`Unknown action: ${JSON.stringify(action)}`);
   }

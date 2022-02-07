@@ -6,31 +6,80 @@ import { makeDefaultPallet } from "./Pallet/palletModel";
 import { Pallet } from "./Pallet/Pallet";
 import { Tile } from "./Tile/Tile";
 import { makeDefaultTile } from "./Tile/tileModel";
+import { Sprite } from "./Sprite/Sprite";
+import { SpriteModel } from "./Sprite/spriteModel";
+import { Action } from "./AppState/actions";
+import { act } from "react-dom/test-utils";
 
-export const defaultState: AppState = {
+const localStorageKey = 'snes-tile-state';
+
+export const defaultState: AppState = JSON.parse(localStorage.getItem(localStorageKey) ?? "null") as AppState ?? {
   pallets: [...Array(8)].map(() => makeDefaultPallet()),
   selectedPalletIndex: 0,
-  selectedPixels: null,
-  selectedTileIndex: 0,
-  tiles: [makeDefaultTile()], // add more tiles later
+  selectedPixels: {},
+  name: 0,
+  tiles: [...Array(64)].map(() => makeDefaultTile()),
+  // spriteSize: [8,8]
+  spriteSize: [16, 16],
 };
 
-function App() {
-  const [state, dispatch] = useReducer(appStateReducer, defaultState);
-  const selectedTile = state.tiles[state.selectedTileIndex];
-  const selectedPallet = state.pallets[selectedTile.palletIndex];
-  const getColor = (palletIndex: number, colorIndex: number) => state.pallets[palletIndex][colorIndex];
+type ReducerT = (state: AppState, action: Action) => AppState
 
-  console.log('selected pixels:', state.selectedPixels);
+type Middleware = (nextReducer: ReducerT) => ReducerT
+
+const logger: Middleware = nextReducer => (state, action) => {
+  console.log('[LOGGER]', state, action);
+  return nextReducer(state, action);
+}
+
+const saver: Middleware = nextReducer => (state, action) => {
+  const newState = nextReducer(state, action);
+  localStorage.setItem('snes-tile-state', JSON.stringify(newState));
+  debugger;
+  return newState;
+}
+
+const applyMiddleware: (middlewares: Middleware[], reducer: ReducerT) => ReducerT =
+  (middlewares, reducer) => middlewares.reduce((r,m) => m(r), reducer);
+
+const reducer = applyMiddleware([
+  logger,
+  saver,
+], appStateReducer);
+
+function App() {
+  const [state, dispatch] = useReducer(reducer, defaultState);
+  const selectedTile = state.tiles[state.name];
+  const selectedPallet = state.pallets[selectedTile.palletIndex];
+  const getColor = (palletIndex: number, colorIndex: number) =>
+    state.pallets[palletIndex][colorIndex];
+  const getSelectedPixels = (name: number) => state.selectedPixels[name];
+
+  const spriteModel: SpriteModel = {
+    tiles: state.tiles,
+    name: state.name,
+    size: state.spriteSize,
+  };
+
+  console.log("selected pixels:", state.selectedPixels);
 
   return (
     <div className="App">
-      <AppContext.Provider value={{ dispatch, getColor }}>
-        <Tile
-          tile={selectedTile}
-          selectedPixels={state.selectedPixels}
-        />
+      <AppContext.Provider value={{ dispatch, getColor, getSelectedPixels }}>
+        <Sprite sprite={spriteModel} />
         <Pallet pallet={selectedPallet} />
+        <button
+          grid-area="buttons"
+          onClick={() =>
+            dispatch({
+              type: "deselect-pixel",
+              payload: null,
+            })
+          }
+          className="clear-selection"
+        >
+          Clear Selection
+        </button>
       </AppContext.Provider>
     </div>
   );

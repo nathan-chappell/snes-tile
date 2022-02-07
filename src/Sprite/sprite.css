@@ -1,0 +1,8 @@
+.sprite-16-16 {
+    grid-area: Sprite;
+    display: grid;
+    width: 700px;
+    grid-template: 
+        "tile0 tile1" 274px
+        "tile16 tile17" 274px / 274px 274px;
+}
