@@ -1,3 +1,7 @@
+.pallet {
+    grid-area: "Pallet";
+}
+
 .pallet-color {
     color: inherit;
 }

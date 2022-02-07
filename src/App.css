@@ -1,0 +1,11 @@
+.App {
+    margin: 12px;
+    display: grid;
+    grid-template: 
+        "Tile Pallet" 
+        "buttons xxx"/ 300px auto;
+}
+
+html {
+    background: #333;
+}

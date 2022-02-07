@@ -1,5 +1,5 @@
 import { createContext, Dispatch } from "react"
-import { Color } from "../Pallet/pallet";
+import { Color } from "../Pallet/palletModel";
 import { Action } from "./appState";
 
 interface IAppContext {

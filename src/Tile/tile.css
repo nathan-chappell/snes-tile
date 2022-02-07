@@ -20,8 +20,18 @@
 
 .tile {
     border-collapse: collapse;
+    grid-area: "Tile";
+    table-layout: fixed;
+    width: 256px;
+    height: 256px;
 }
 
 .tile-row {
+    color: inherit;
+}
 
+.clear-selection {
+    width: 100px;
+    height: 40px;
+    grid-area: buttons;
 }
