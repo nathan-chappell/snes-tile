@@ -1,0 +1,10 @@
+.control-panel {
+    border: solid gray 4px;
+    border-radius: 2px;
+    background: lightgray;
+}
+
+.input-label {
+    color: inherit;
+    margin: 4px;
+}

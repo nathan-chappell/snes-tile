@@ -1,7 +1,16 @@
+import { off } from "process";
 import { Color, Pallet } from "../Pallet/palletModel";
 import { SpriteSize } from "../Sprite/spriteModel";
 import { TileModel } from "../Tile/tileModel";
 import { Action } from "./actions";
+
+export type SpriteSizes =
+  | [8, 16]
+  | [8, 32]
+  | [8, 64]
+  | [16, 32]
+  | [16, 64]
+  | [32, 64];
 
 export interface AppState {
   pallets: Pallet[];
@@ -9,23 +18,26 @@ export interface AppState {
   selectedPixels: { [name: number]: [number, number][] | null };
   name: number;
   tiles: TileModel[];
-  spriteSize: SpriteSize;
+  spriteSize: SpriteSizes;
+  spriteSizeSelect: 0 | 1;
 }
 
-const getCurrentTiles: (state: AppState) => [number, TileModel][] = (state) => {
-  const [w, h] = state.spriteSize;
-  if (w === 8 && h === 8) {
-    return [[state.name, state.tiles[state.name]]];
-  } else if (w === 16 && h === 16) {
-    return [
-      [state.name, state.tiles[state.name]],
-      [state.name + 1, state.tiles[state.name + 1]],
-      [state.name + 16, state.tiles[state.name + 16]],
-      [state.name + 17, state.tiles[state.name + 17]],
-    ];
-  } else {
-    throw new Error("NotImplemented");
+const getCurrentTiles: (state: AppState) => [number, TileModel][] = ({
+  spriteSize,
+  spriteSizeSelect,
+  tiles,
+  name,
+}) => {
+  // const [w, h] = state.spriteSize;
+  const dotsPerTile = spriteSize[spriteSizeSelect];
+  let result: [number, TileModel][] = [];
+  for (let i = 0; i < dotsPerTile / 8; ++i) {
+    for (let j = 0; j < dotsPerTile / 8; ++j) {
+      const offset = name + i * 16 + j;
+      result.push([offset, tiles[offset]]);
+    }
   }
+  return result;
 };
 
 const updatePallet = (pallet: Pallet, colorIndex: number, color: Color) => [
@@ -45,15 +57,6 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (
       return {
         ...state,
         selectedPixels: {},
-      };
-
-    case "select-pixel":
-      return {
-        ...state,
-        selectedPixels: {
-          ...state.selectedPixels,
-          [action.payload.name]: action.payload.selectedPixels,
-        },
       };
 
     case "select-another-pixel":
@@ -78,7 +81,6 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (
           return [oldName, { ...oldTile, pixels: newPixels }];
         }
       );
-      debugger;
       return {
         ...state,
         tiles: newTiles.reduce(
@@ -87,6 +89,22 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (
         ),
       };
     }
+
+    case "select-pixel":
+      return {
+        ...state,
+        selectedPixels: {
+          ...state.selectedPixels,
+          [action.payload.name]: action.payload.selectedPixels,
+        },
+      };
+
+    case "sprite-size-select":
+      return {
+        ...state,
+        spriteSizeSelect: action.payload
+      }
+      break;
 
     case "update-pallet": {
       const { colorIndex, rgbIndex, value } = action.payload;
@@ -116,6 +134,12 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (
           [selectedPalletIndex]: newPallet,
         },
       };
+
+    case "update-sprite-size":
+      return {
+        ...state,
+        spriteSize: action.payload
+      }
 
     default:
       throw new Error(`Unknown action: ${JSON.stringify(action)}`);

@@ -9,7 +9,7 @@ import { makeDefaultTile } from "./Tile/tileModel";
 import { Sprite } from "./Sprite/Sprite";
 import { SpriteModel } from "./Sprite/spriteModel";
 import { Action } from "./AppState/actions";
-import { act } from "react-dom/test-utils";
+import { ControlPanel } from "./Controls/ControlPanel";
 
 const localStorageKey = 'snes-tile-state';
 
@@ -18,9 +18,9 @@ export const defaultState: AppState = JSON.parse(localStorage.getItem(localStora
   selectedPalletIndex: 0,
   selectedPixels: {},
   name: 0,
-  tiles: [...Array(64)].map(() => makeDefaultTile()),
-  // spriteSize: [8,8]
-  spriteSize: [16, 16],
+  tiles: [...Array(64*64)].map(() => makeDefaultTile()),
+  spriteSize: [8, 16],
+  spriteSizeSelect: 0
 };
 
 type ReducerT = (state: AppState, action: Action) => AppState
@@ -35,7 +35,6 @@ const logger: Middleware = nextReducer => (state, action) => {
 const saver: Middleware = nextReducer => (state, action) => {
   const newState = nextReducer(state, action);
   localStorage.setItem('snes-tile-state', JSON.stringify(newState));
-  debugger;
   return newState;
 }
 
@@ -58,7 +57,7 @@ function App() {
   const spriteModel: SpriteModel = {
     tiles: state.tiles,
     name: state.name,
-    size: state.spriteSize,
+    size: state.spriteSize[state.spriteSizeSelect],
   };
 
   console.log("selected pixels:", state.selectedPixels);
@@ -68,18 +67,7 @@ function App() {
       <AppContext.Provider value={{ dispatch, getColor, getSelectedPixels }}>
         <Sprite sprite={spriteModel} />
         <Pallet pallet={selectedPallet} />
-        <button
-          grid-area="buttons"
-          onClick={() =>
-            dispatch({
-              type: "deselect-pixel",
-              payload: null,
-            })
-          }
-          className="clear-selection"
-        >
-          Clear Selection
-        </button>
+        <ControlPanel state={state} />
       </AppContext.Provider>
     </div>
   );

@@ -1,4 +1,39 @@
 import { Color } from "../Pallet/palletModel";
+import { SpriteSizes } from "./appState";
+
+export interface DeselectPixelAction {
+  type: "deselect-pixel";
+  payload: null;
+}
+
+export type SelectColorPayload = number;
+
+export interface SelectColorAction {
+  type: "select-color";
+  payload: SelectColorPayload;
+}
+
+export type SelectPalletPayload = number;
+
+export interface SelectPalletAction {
+  type: "select-pallet";
+  payload: SelectPalletPayload;
+}
+
+export interface SelectPixelPayload {
+  selectedPixels: [number, number][] | null;
+  name: number;
+}
+
+export interface SelectPixelAction {
+  type: "select-pixel" | "select-another-pixel";
+  payload: SelectPixelPayload;
+}
+
+export interface SpriteSizeSelectAction {
+  type: "sprite-size-select";
+  payload: 0 | 1;
+}
 
 export interface UpdatePalletPayload {
   colorIndex: number;
@@ -21,39 +56,18 @@ export interface UpdatePalletColorAction {
   payload: UpdatePalletColorPayload;
 }
 
-export type SelectPalletPayload = number;
-
-export interface SelectPalletAction {
-  type: "select-pallet";
-  payload: SelectPalletPayload;
-}
-
-export interface SelectPixelPayload {
-  selectedPixels: [number, number][] | null;
-  name: number;
-}
-
-export interface SelectPixelAction {
-  type: "select-pixel" | "select-another-pixel";
-  payload: SelectPixelPayload;
-}
-
-export interface DeselectPixelAction {
-  type: "deselect-pixel";
-  payload: null;
-}
-
-export type SelectColorPayload = number;
-
-export interface SelectColorAction {
-  type: "select-color";
-  payload: SelectColorPayload;
+export interface UpdateSpriteSizeAction {
+  type: "update-sprite-size"
+  payload: SpriteSizes
 }
 
 export type Action =
-  | UpdatePalletAction
-  | UpdatePalletColorAction
+  | DeselectPixelAction
+  | SelectColorAction
   | SelectPalletAction
   | SelectPixelAction
-  | SelectColorAction
-  | DeselectPixelAction;
+  | SpriteSizeSelectAction
+  | UpdatePalletAction
+  | UpdatePalletColorAction
+  | UpdateSpriteSizeAction
+  ;

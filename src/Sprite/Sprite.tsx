@@ -8,33 +8,28 @@ export interface SpriteProps {
   sprite: SpriteModel;
 }
 
-export const Sprite = ({ sprite }: SpriteProps) => {
+export const Sprite = ({ sprite: {name, size, tiles} }: SpriteProps) => {
   const { getSelectedPixels } = useContext(AppContext);
 
-  const [w, h] = sprite.size;
-  if (w === 8 && h === 8) {
-    return (
-      <div className="sprite sprite-8-8">
+  const renderedTiles: JSX.Element[] = [];
+
+  for (let i = 0; i < size / 8; ++i) {
+    for (let j = 0; j < size / 8; ++j) {
+      const offset = name + i*16 + j;
+      renderedTiles.push(
         <Tile
-          tile={sprite.tiles[sprite.name]}
-          selectedPixels={getSelectedPixels(sprite.name)}
-          name={sprite.name}
+          tile={tiles[offset]}
+          selectedPixels={getSelectedPixels(offset)}
+          name={offset}
+          key={offset}
         />
-      </div>
-    );
-  } else if (w === 16 && h === 16) {
-    return (
-      <div className="sprite sprite-16-16">
-        {[0, 1, 16, 17].map((offset) => (
-          <Tile
-            key={offset}
-            tile={sprite.tiles[sprite.name + offset]}
-            selectedPixels={getSelectedPixels(sprite.name + offset)}
-            name={sprite.name + offset}
-          />
-        ))}
-      </div>
-    );
+      );
+    }
   }
-  return null;
+
+  return (
+    <div className={`sprite sprite-${size}`}>
+      {renderedTiles}
+    </div>
+  )
 };

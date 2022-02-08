@@ -3,7 +3,7 @@
     display: grid;
     grid-template: 
         "Sprite Pallet" 
-        "buttons xxx" / 900px auto;
+        "buttons xxx" / auto auto;
 }
 
 html {
