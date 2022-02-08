@@ -28,7 +28,6 @@ const getCurrentTiles: (state: AppState) => [number, TileModel][] = ({
   tiles,
   name,
 }) => {
-  // const [w, h] = state.spriteSize;
   const dotsPerTile = spriteSize[spriteSizeSelect];
   let result: [number, TileModel][] = [];
   for (let i = 0; i < dotsPerTile / 8; ++i) {

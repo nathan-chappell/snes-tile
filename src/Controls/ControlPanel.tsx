@@ -56,7 +56,7 @@ export const ControlPanel = ({
         }
       >
         {Object.keys(spriteStringMap).map((k) => (
-          <option value={k}>{k}</option>
+          <option value={k} key={k}>{k}</option>
         ))}
       </select>
     </div>

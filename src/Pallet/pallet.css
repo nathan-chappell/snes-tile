@@ -1,5 +1,6 @@
 .pallet {
-    grid-area: "Pallet";
+    grid-area: Pallet;
+    width: 350px;
 }
 
 .pallet-color {
