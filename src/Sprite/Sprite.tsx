@@ -22,17 +22,20 @@ export const Sprite = ({
     }
   };
   const onMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
     if (state.mouseOver) {
       const newState = e.altKey ? "erasing" : "drawing";
       spriteEventHandler({type: newState});
     }
   };
   const onMouseUp = (e: React.MouseEvent) => {
+    e.preventDefault();
     if (state.mouseOver) {
       spriteEventHandler({type: "none"});
     }
   };
   const onMouseOut = (e: React.MouseEvent) => {
+    e.preventDefault();
     if (state.mouseOver) {
       setState({ ...state, mouseOver: false });
     }

@@ -1,7 +1,7 @@
 import { off } from "process";
 import { Color, Pallet } from "../Pallet/palletModel";
 import { SpriteSize } from "../Sprite/spriteModel";
-import { cloneTile, TileModel } from "../Tile/tileModel";
+import { cloneTile, PixelId, TileModel } from "../Tile/tileModel";
 import { Action } from "./actions";
 
 export type SpriteSizes =
@@ -20,7 +20,7 @@ export interface AppState {
   pallets: Pallet[];
   selectedColorIndex: number;
   selectedPalletIndex: number;
-  selectedPixels: { [name: number]: [number, number][] | null };
+  selectedPixels: PixelId[];
   spriteSize: SpriteSizes;
   spriteSizeSelect: 0 | 1;
   tiles: TileModel[];
@@ -43,6 +43,27 @@ const getCurrentTiles: (state: AppState) => [number, TileModel][] = ({
   return result;
 };
 
+const getPixelsForCurrentPallet: (state: AppState) => PixelId[] = (state) => {
+  const { selectedPalletIndex, selectedColorIndex, tiles } = state;
+  const selectedPixels: PixelId[] = [];
+  for (let name = 0; name < Object.keys(tiles).length; ++name) {
+    if (tiles[name].palletIndex != selectedPalletIndex) continue;
+
+    for (let rowIndex = 0; rowIndex < tiles[name].pixels.length; ++rowIndex) {
+      for (
+        let columnIndex = 0;
+        columnIndex < tiles[name].pixels.length;
+        ++columnIndex
+      ) {
+        if (tiles[name].pixels[rowIndex][columnIndex] == selectedColorIndex) {
+          selectedPixels.push({ name, rowIndex, columnIndex });
+        }
+      }
+    }
+  }
+  return selectedPixels;
+};
+
 const updatePallet = (pallet: Pallet, colorIndex: number, color: Color) => [
   ...pallet.slice(0, colorIndex),
   color,
@@ -57,7 +78,7 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (
     case "deselect-pixel":
       return {
         ...state,
-        selectedPixels: {},
+        selectedPixels: [],
       };
 
     case "mouse-over-pixel": {
@@ -92,7 +113,7 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (
       }
     }
 
-    case "select-another-pixel":
+    /*case "select-another-pixel":
       return {
         ...state,
         selectedPixels: {
@@ -102,37 +123,25 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (
             ...(action.payload.selectedPixels ?? []),
           ],
         },
-      };
+      };*/
 
     case "select-pallet": {
-      /*
-      var newTiles: [number, TileModel][] = getCurrentTiles(state)?.map(
-        ([oldName, oldTile]) => {
-          let newPixels = [...oldTile.pixels.map((a) => [...a])];
-          state.selectedPixels[oldName]?.forEach(([r, c]) => {
-            newPixels[r][c] = action.payload;
-          });
-          return [oldName, { ...oldTile, pixels: newPixels }];
-        }
-      );
-      return {
-        ...state,
-        tiles: newTiles.reduce(
-          (tilesAcc, [_name, newTile]) => ({ ...tilesAcc, [_name]: newTile }),
-          state.tiles
-          ),
-        };
-      */
-      return { ...state, selectedColorIndex: action.payload };
+      const nextState = { ...state, selectedColorIndex: action.payload };
+      if (action.payload == state.selectedColorIndex) {
+        return appStateReducer(nextState, {type:'select-pixel', payload: getPixelsForCurrentPallet(state)})
+      } else {
+        return appStateReducer(nextState, {type:'select-pixel', payload: []})
+      }
     }
 
     case "select-pixel":
       return {
         ...state,
-        selectedPixels: {
-          ...state.selectedPixels,
-          [action.payload.name]: action.payload.selectedPixels,
-        },
+        selectedPixels: action.payload
+        // selectedPixels: {
+        //   ...state.selectedPixels,
+        //   [action.payload.name]: action.payload.selectedPixels,
+        // },
       };
 
     case "sprite-size-select":

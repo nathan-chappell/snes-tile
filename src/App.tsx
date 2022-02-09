@@ -1,4 +1,4 @@
-import React, { useReducer, useRef, useState } from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 import "./App.css";
 import { AppState, appStateReducer } from "./AppState/appState";
 import { AppContext } from "./AppState/appStateContext";
@@ -23,7 +23,7 @@ const initialState: AppState = {
   pallets: [...Array(8)].map(() => makeDefaultPallet()),
   selectedPalletIndex: 0,
   selectedColorIndex: 1,
-  selectedPixels: {},
+  selectedPixels: [],
   spriteSize: [8, 16],
   spriteSizeSelect: 0,
   tiles: [...Array(64 * 64)].map(() => makeDefaultTile()),
@@ -68,13 +68,26 @@ function App() {
   const selectedPallet = state.pallets[selectedTile.palletIndex];
   const getColor = (palletIndex: number, colorIndex: number) =>
     state.pallets[palletIndex][colorIndex];
-  const getSelectedPixels = (name: number) => state.selectedPixels[name];
+  
+  const getSelectedPixels = (name: number) => state.selectedPixels.filter(pixelId => pixelId.name == name);
 
   const spriteModel: SpriteModel = {
     tiles: state.tiles,
     name: state.name,
     size: state.spriteSize[state.spriteSizeSelect],
   };
+
+  let onKeyHandler = (e: KeyboardEvent) => {
+    if ('0' <= e.key && e.key <= '9') {
+      e.preventDefault();
+      dispatch({type:'select-pallet', payload: parseInt(e.key)})
+    }
+  }
+  useEffect(() => {
+    document.addEventListener('keydown', onKeyHandler);
+    return () => document.removeEventListener('keydown', onKeyHandler);
+  })
+
 
   const spriteEventHandler: SpriteEventHandler = (e) => {
     switch (e.type) {
@@ -91,7 +104,7 @@ function App() {
       case "pixel": {
         if (e.type !== 'pixel-single' && spriteDrawingStateRef.current.state == "none") break;
         const value =
-          spriteDrawingStateRef.current.state == "drawing" || "none"
+          spriteDrawingStateRef.current.state == "drawing"
             ? state.selectedColorIndex
             : 0;
         dispatch({

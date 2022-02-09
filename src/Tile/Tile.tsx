@@ -8,7 +8,7 @@ import { SpriteEventHandler } from "../Sprite/spriteModel";
 
 export interface TileProps {
   tile: TileModel;
-  selectedPixels: [number, number][] | null;
+  selectedPixels: PixelId[];
   name: number;
   spriteEventHandler: SpriteEventHandler;
 }
@@ -23,7 +23,7 @@ export const Tile = ({
 
   const getClassName = (rowIndex: number, colIndex: number) =>
     selectedPixels?.find(
-      ([_rowIndex, _colIndex]) =>
+      ({rowIndex: _rowIndex, columnIndex: _colIndex}) =>
         _rowIndex === rowIndex && _colIndex === colIndex
     )
       ? "selected-pixel"
@@ -42,7 +42,7 @@ export const Tile = ({
           });
 
   return (
-    <div grid-area={`tile${name}`}>
+    <div grid-area={`tile${name}`} >
       <table className="tile" tabIndex={2}>
         <tbody>
           {tile.pixels.map((row, rowIndex) => (

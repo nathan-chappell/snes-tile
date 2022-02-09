@@ -28,14 +28,9 @@ export interface SelectPalletAction {
   payload: SelectPalletPayload;
 }
 
-export interface SelectPixelPayload {
-  selectedPixels: [number, number][] | null;
-  name: number;
-}
-
 export interface SelectPixelAction {
   type: "select-pixel" | "select-another-pixel";
-  payload: SelectPixelPayload;
+  payload: PixelId[];
 }
 
 export interface SpriteSizeSelectAction {
