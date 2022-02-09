@@ -1,9 +1,20 @@
 import { Color } from "../Pallet/palletModel";
 import { SpriteSizes } from "./appState";
 
+export interface PixelId {
+  name: number
+  rowIndex: number
+  columnIndex: number
+}
+
 export interface DeselectPixelAction {
   type: "deselect-pixel";
   payload: null;
+}
+
+export interface MouseOverPixelAction {
+  type: "mouse-over-pixel"
+  payload: PixelId
 }
 
 export type SelectColorPayload = number;
@@ -70,4 +81,5 @@ export type Action =
   | UpdatePalletAction
   | UpdatePalletColorAction
   | UpdateSpriteSizeAction
+  | MouseOverPixelAction
   ;

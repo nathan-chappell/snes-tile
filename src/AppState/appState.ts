@@ -12,14 +12,18 @@ export type SpriteSizes =
   | [16, 64]
   | [32, 64];
 
+export type DrawingState = "none" | "drawing" | "erasing";
+
 export interface AppState {
-  pallets: Pallet[];
-  selectedPalletIndex: number;
-  selectedPixels: { [name: number]: [number, number][] | null };
-  name: number;
-  tiles: TileModel[];
-  spriteSize: SpriteSizes;
-  spriteSizeSelect: 0 | 1;
+  drawingState: DrawingState
+  name: number
+  pallets: Pallet[]
+  selectedColorIndex: number
+  selectedPalletIndex: number
+  selectedPixels: { [name: number]: [number, number][] | null }
+  spriteSize: SpriteSizes
+  spriteSizeSelect: 0 | 1
+  tiles: TileModel[]
 }
 
 const getCurrentTiles: (state: AppState) => [number, TileModel][] = ({
@@ -58,6 +62,35 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (
         selectedPixels: {},
       };
 
+    case "mouse-over-pixel": {
+      const { name, rowIndex, columnIndex } = action.payload;
+      switch (state.drawingState) {
+        case 'none':
+          return state;
+        case 'drawing':
+          return {
+            ...state,
+            tiles: {
+              ...state.tiles,
+              [action.payload.name]: {
+                ...state.tiles[action.payload.name]
+                [act]
+              }
+            }
+          };
+        case 'erasing':
+          return {
+            ...state,
+            tiles: {
+              ...state.tiles,
+              // [action.payload.name]: 0
+            }
+          };
+        default:
+          return state;
+      }
+    }
+
     case "select-another-pixel":
       return {
         ...state,
@@ -71,6 +104,7 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (
       };
 
     case "select-pallet": {
+      /*
       var newTiles: [number, TileModel][] = getCurrentTiles(state)?.map(
         ([oldName, oldTile]) => {
           let newPixels = [...oldTile.pixels.map((a) => [...a])];
@@ -85,8 +119,10 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (
         tiles: newTiles.reduce(
           (tilesAcc, [_name, newTile]) => ({ ...tilesAcc, [_name]: newTile }),
           state.tiles
-        ),
-      };
+          ),
+        };
+      */
+      return { ...state, selectedColorIndex: action.payload }
     }
 
     case "select-pixel":

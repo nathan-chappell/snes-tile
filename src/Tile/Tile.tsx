@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { TileModel } from "./tileModel";
 import "./tile.css";
 import { color2css } from "../Pallet/palletModel";
@@ -23,6 +23,18 @@ export const Tile = ({ tile, selectedPixels, name }: TileProps) => {
       ? "selected-pixel"
       : "pixel";
 
+  // const onTileClick = (e) =>
+  //   dispatch({
+  //     type: e.ctrlKey ? "select-another-pixel" : "select-pixel",
+  //     payload: { selectedPixels: [[rowIndex, colIndex]], name },
+  //   });
+  const onMouseOverPixel =
+    (rowIndex: number, colIndex: number) => (e: MouseEvent) =>
+      dispatch({
+        type: "mouse-over-pixel",
+        payload: { pixelId: {name, rowIndex, colIndex} },
+      });
+
   return (
     <div grid-area={`tile${name}`}>
       <table className="tile" tabIndex={2}>
@@ -36,12 +48,7 @@ export const Tile = ({ tile, selectedPixels, name }: TileProps) => {
                   style={{
                     background: color2css(getColor(tile.palletIndex, pixel)),
                   }}
-                  onClick={(e) =>
-                    dispatch({
-                      type: e.ctrlKey ? "select-another-pixel" : "select-pixel",
-                      payload: { selectedPixels: [[rowIndex, colIndex]], name },
-                    })
-                  }
+                  onMouseOver
                 />
               ))}
             </tr>

@@ -2,6 +2,7 @@
 
 export type Pixel = number
 export type TileSize = [8,8]
+export type PixelId = [number, number, number]; // [name,row,column]
 
 export interface TileModel {
     pixels: Pixel[][]

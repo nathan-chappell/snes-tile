@@ -3,9 +3,16 @@
     display: grid;
     grid-template: 
         "Sprite Pallet" 
-        "buttons xxx" / auto auto;
+        "buttons xxx" / min-content min-content;
 }
 
 html {
     background: #333;
+}
+
+.container {
+    margin-right: auto;
+    margin-left: auto;
+    width: fit-content;
+    padding: 4px;
 }

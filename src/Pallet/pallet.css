@@ -11,11 +11,10 @@
     overflow: hidden;
 }
 
-
-
 .pallet-color input {
     width: 64px;
     padding: 2px 4px;
+    margin: 2px 2px;
     vertical-align: middle;
 }
 
@@ -26,4 +25,8 @@
     display: inline-block;
     width: 16px;
     height: 16px;
+}
+
+.selected-pallet-color {
+    border: solid blue 4px;
 }

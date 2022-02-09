@@ -11,40 +11,48 @@ import { SpriteModel } from "./Sprite/spriteModel";
 import { Action } from "./AppState/actions";
 import { ControlPanel } from "./Controls/ControlPanel";
 
-const localStorageKey = 'snes-tile-state';
+const localStorageKey = "snes-tile-state";
 
-export const defaultState: AppState = JSON.parse(localStorage.getItem(localStorageKey) ?? "null") as AppState ?? {
+const initialState: AppState = {
+  drawingState: "none",
+  name: 0,
   pallets: [...Array(8)].map(() => makeDefaultPallet()),
   selectedPalletIndex: 0,
+  selectedColorIndex: 1,
   selectedPixels: {},
-  name: 0,
-  tiles: [...Array(64*64)].map(() => makeDefaultTile()),
   spriteSize: [8, 16],
-  spriteSizeSelect: 0
+  spriteSizeSelect: 0,
+  tiles: [...Array(64 * 64)].map(() => makeDefaultTile()),
 };
 
-type ReducerT = (state: AppState, action: Action) => AppState
+const savedState: AppState = JSON.parse(
+  localStorage.getItem(localStorageKey) ?? "{}"
+);
 
-type Middleware = (nextReducer: ReducerT) => ReducerT
+export const defaultState = { ...initialState, ...savedState };
 
-const logger: Middleware = nextReducer => (state, action) => {
-  console.log('[LOGGER]', state, action);
+type ReducerT = (state: AppState, action: Action) => AppState;
+
+type Middleware = (nextReducer: ReducerT) => ReducerT;
+
+const logger: Middleware = (nextReducer) => (state, action) => {
+  console.log("[LOGGER]", state, action);
   return nextReducer(state, action);
-}
+};
 
-const saver: Middleware = nextReducer => (state, action) => {
+const saver: Middleware = (nextReducer) => (state, action) => {
   const newState = nextReducer(state, action);
-  localStorage.setItem('snes-tile-state', JSON.stringify(newState));
+  localStorage.setItem("snes-tile-state", JSON.stringify(newState));
   return newState;
-}
+};
 
-const applyMiddleware: (middlewares: Middleware[], reducer: ReducerT) => ReducerT =
-  (middlewares, reducer) => middlewares.reduce((r,m) => m(r), reducer);
+const applyMiddleware: (
+  middlewares: Middleware[],
+  reducer: ReducerT
+) => ReducerT = (middlewares, reducer) =>
+  middlewares.reduce((r, m) => m(r), reducer);
 
-const reducer = applyMiddleware([
-  logger,
-  saver,
-], appStateReducer);
+const reducer = applyMiddleware([logger, saver], appStateReducer);
 
 function App() {
   const [state, dispatch] = useReducer(reducer, defaultState);
@@ -66,7 +74,10 @@ function App() {
     <div className="App">
       <AppContext.Provider value={{ dispatch, getColor, getSelectedPixels }}>
         <Sprite sprite={spriteModel} />
-        <Pallet pallet={selectedPallet} />
+        <Pallet
+          pallet={selectedPallet}
+          selectedColorIndex={state.selectedColorIndex}
+        />
         <ControlPanel state={state} />
       </AppContext.Provider>
     </div>
