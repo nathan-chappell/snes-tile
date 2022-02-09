@@ -4,6 +4,13 @@
     background: lightgray;
 }
 
+.control-panel-item {
+    border: solid black 2px;
+    padding: 4px;
+    border-radius: 2px;
+    display: inline-block;
+}
+
 .input-label {
     color: inherit;
     margin: 4px;

@@ -81,6 +81,12 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (
         selectedPixels: [],
       };
 
+    case "load-tiles":
+      return {
+        ...state,
+        tiles: action.payload,
+      };
+
     case "mouse-over-pixel": {
       const { name, rowIndex, columnIndex } = action.payload;
       switch (state.drawingState) {
@@ -113,6 +119,16 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (
       }
     }
 
+    case "save-tiles":{
+      const a = document.createElement('a');
+      const url = URL.createObjectURL(new Blob([JSON.stringify(state.tiles)]));
+      a.href = url;
+      a.download = "tiles.json";
+      a.click();
+      URL.revokeObjectURL(url);
+      return state;
+    }
+
     /*case "select-another-pixel":
       return {
         ...state,
@@ -124,20 +140,31 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (
           ],
         },
       };*/
+    case "select-name":
+      return {
+        ...state,
+        name: action.payload,
+      };
 
     case "select-pallet": {
       const nextState = { ...state, selectedColorIndex: action.payload };
       if (action.payload == state.selectedColorIndex) {
-        return appStateReducer(nextState, {type:'select-pixel', payload: getPixelsForCurrentPallet(state)})
+        return appStateReducer(nextState, {
+          type: "select-pixel",
+          payload: getPixelsForCurrentPallet(state),
+        });
       } else {
-        return appStateReducer(nextState, {type:'select-pixel', payload: []})
+        return appStateReducer(nextState, {
+          type: "select-pixel",
+          payload: [],
+        });
       }
     }
 
     case "select-pixel":
       return {
         ...state,
-        selectedPixels: action.payload
+        selectedPixels: action.payload,
         // selectedPixels: {
         //   ...state.selectedPixels,
         //   [action.payload.name]: action.payload.selectedPixels,

@@ -1,17 +1,24 @@
 import { Color } from "../Pallet/palletModel";
-import { PixelId } from "../Tile/tileModel";
+import { PixelId, TileModel } from "../Tile/tileModel";
 import { SpriteSizes } from "./appState";
-
-
 
 export interface DeselectPixelAction {
   type: "deselect-pixel";
   payload: null;
 }
 
+export interface LoadTilesAction {
+  type: "load-tiles";
+  payload: TileModel[];
+}
+
 export interface MouseOverPixelAction {
-  type: "mouse-over-pixel"
-  payload: PixelId
+  type: "mouse-over-pixel";
+  payload: PixelId;
+}
+
+export interface SaveTilesAction {
+  type: "save-tiles";
 }
 
 export type SelectColorPayload = number;
@@ -19,6 +26,11 @@ export type SelectColorPayload = number;
 export interface SelectColorAction {
   type: "select-color";
   payload: SelectColorPayload;
+}
+
+export interface SelectNameAction {
+  type: "select-name";
+  payload: number;
 }
 
 export type SelectPalletPayload = number;
@@ -60,29 +72,31 @@ export interface UpdatePalletColorAction {
 }
 
 export interface UpdatePixelPayload {
-  pixelId: PixelId
-  value: number
+  pixelId: PixelId;
+  value: number;
 }
 
 export interface UpdatePixelAction {
-  type: 'update-pixel'
-  payload: UpdatePixelPayload
+  type: "update-pixel";
+  payload: UpdatePixelPayload;
 }
 
 export interface UpdateSpriteSizeAction {
-  type: "update-sprite-size"
-  payload: SpriteSizes
+  type: "update-sprite-size";
+  payload: SpriteSizes;
 }
 
 export type Action =
   | DeselectPixelAction
+  | LoadTilesAction
+  | MouseOverPixelAction
+  | SaveTilesAction
   | SelectColorAction
+  | SelectNameAction
   | SelectPalletAction
   | SelectPixelAction
   | SpriteSizeSelectAction
   | UpdatePalletAction
   | UpdatePalletColorAction
   | UpdatePixelAction
-  | UpdateSpriteSizeAction
-  | MouseOverPixelAction
-  ;
+  | UpdateSpriteSizeAction;

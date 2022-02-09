@@ -4,9 +4,6 @@ import { DeselectPixel } from "./DeselectPixel";
 import "./controls.css";
 import { AppState, SpriteSizes } from "../AppState/appState";
 import { SpriteSizeSelectCheckbox } from "./SpriteSizeSelectCheckbox";
-import { SpriteSizeSelect } from "./SpriteSizeSelect";
-import { NameInput } from "./NameInput";
-import { SaveAndLoadTiles } from "./SaveAndLoadTiles";
 
 export interface ControlPanelProps {
   state: AppState;
@@ -21,8 +18,40 @@ const spriteStringMap: { [spriteSizeString: string]: SpriteSizes } = {
   "32 - 64": [32, 64],
 };
 
+export interface SpriteSizeSelectProps {
+  spriteSizeString: string
+}
+
+export const SpriteSizeSelect = ({spriteSizeString}: SpriteSizeSelectProps) => {
+  const { dispatch } = useContext(AppContext);
+  return (
+    <div className="control-panel-item">
+      <label className="input-label" htmlFor="spriteSize">
+        Sprite Size
+      </label>
+      <select
+        value={spriteSizeString}
+        name="spriteSize"
+        onChange={(e) =>
+          dispatch({
+            type: "update-sprite-size",
+            payload:
+              spriteStringMap[e.target.options[e.target.selectedIndex].value],
+          })
+        }
+      >
+        {Object.keys(spriteStringMap).map((k) => (
+          <option value={k} key={k}>
+            {k}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+};
+
 export const ControlPanel = ({
-  state: { name, spriteSize, spriteSizeSelect },
+  state: { spriteSize, spriteSizeSelect },
 }: ControlPanelProps) => {
   const { dispatch } = useContext(AppContext);
 
@@ -32,9 +61,6 @@ export const ControlPanel = ({
     <div className="control-panel">
       <DeselectPixel />
       <SpriteSizeSelectCheckbox spriteSizeSelect={spriteSizeSelect} />
-      <SpriteSizeSelect spriteSizeString={spriteSizeString} />
-      <NameInput name={name} />
-      <SaveAndLoadTiles />
     </div>
   );
 };
