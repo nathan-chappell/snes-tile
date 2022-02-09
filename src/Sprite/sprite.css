@@ -1,8 +1,11 @@
-.sprite {
+/* div.sprite is used for precedence in cascade */
+div.sprite {
   border: solid gray 4px;
   border-radius: 2px;
   grid-area: Sprite;
   display: grid;
+  height: min-content;
+  width: min-content;
 }
 
 .sprite-8 {

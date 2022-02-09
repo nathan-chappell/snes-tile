@@ -1,7 +1,7 @@
 import { off } from "process";
 import { Color, Pallet } from "../Pallet/palletModel";
 import { SpriteSize } from "../Sprite/spriteModel";
-import { TileModel } from "../Tile/tileModel";
+import { cloneTile, TileModel } from "../Tile/tileModel";
 import { Action } from "./actions";
 
 export type SpriteSizes =
@@ -15,15 +15,15 @@ export type SpriteSizes =
 export type DrawingState = "none" | "drawing" | "erasing";
 
 export interface AppState {
-  drawingState: DrawingState
-  name: number
-  pallets: Pallet[]
-  selectedColorIndex: number
-  selectedPalletIndex: number
-  selectedPixels: { [name: number]: [number, number][] | null }
-  spriteSize: SpriteSizes
-  spriteSizeSelect: 0 | 1
-  tiles: TileModel[]
+  drawingState: DrawingState;
+  name: number;
+  pallets: Pallet[];
+  selectedColorIndex: number;
+  selectedPalletIndex: number;
+  selectedPixels: { [name: number]: [number, number][] | null };
+  spriteSize: SpriteSizes;
+  spriteSizeSelect: 0 | 1;
+  tiles: TileModel[];
 }
 
 const getCurrentTiles: (state: AppState) => [number, TileModel][] = ({
@@ -53,8 +53,6 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (
   state,
   action
 ) => {
-  console.log("[appStateReducer] state: ", state, "action: ", action);
-
   switch (action.type) {
     case "deselect-pixel":
       return {
@@ -65,27 +63,30 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (
     case "mouse-over-pixel": {
       const { name, rowIndex, columnIndex } = action.payload;
       switch (state.drawingState) {
-        case 'none':
+        case "none":
           return state;
-        case 'drawing':
+        case "drawing": {
+          const newTile = cloneTile(state.tiles[name]);
+          newTile.pixels[rowIndex][columnIndex] = state.selectedColorIndex;
           return {
             ...state,
             tiles: {
               ...state.tiles,
-              [action.payload.name]: {
-                ...state.tiles[action.payload.name]
-                [act]
-              }
-            }
+              [name]: newTile,
+            },
           };
-        case 'erasing':
+        }
+        case "erasing": {
+          const newTile = cloneTile(state.tiles[name]);
+          newTile.pixels[rowIndex][columnIndex] = 0;
           return {
             ...state,
             tiles: {
               ...state.tiles,
-              // [action.payload.name]: 0
-            }
+              [name]: newTile,
+            },
           };
+        }
         default:
           return state;
       }
@@ -122,7 +123,7 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (
           ),
         };
       */
-      return { ...state, selectedColorIndex: action.payload }
+      return { ...state, selectedColorIndex: action.payload };
     }
 
     case "select-pixel":
@@ -137,8 +138,8 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (
     case "sprite-size-select":
       return {
         ...state,
-        spriteSizeSelect: action.payload
-      }
+        spriteSizeSelect: action.payload,
+      };
       break;
 
     case "update-pallet": {
@@ -170,11 +171,24 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (
         },
       };
 
+    case "update-pixel": {
+      const { pixelId, value } = action.payload;
+      const { name, rowIndex, columnIndex } = pixelId;
+      const newTile = cloneTile(state.tiles[name]);
+      newTile.pixels[rowIndex][columnIndex] = value;
+      return {
+        ...state,
+        tiles: {
+          ...state.tiles,
+          [name]: newTile,
+        },
+      };
+    }
     case "update-sprite-size":
       return {
         ...state,
-        spriteSize: action.payload
-      }
+        spriteSize: action.payload,
+      };
 
     default:
       throw new Error(`Unknown action: ${JSON.stringify(action)}`);

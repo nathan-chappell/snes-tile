@@ -1,13 +1,17 @@
-import React, { useReducer } from "react";
+import React, { useReducer, useRef, useState } from "react";
 import "./App.css";
 import { AppState, appStateReducer } from "./AppState/appState";
 import { AppContext } from "./AppState/appStateContext";
 import { makeDefaultPallet } from "./Pallet/palletModel";
 import { Pallet } from "./Pallet/Pallet";
 import { Tile } from "./Tile/Tile";
-import { makeDefaultTile } from "./Tile/tileModel";
+import { makeDefaultTile, PixelId } from "./Tile/tileModel";
 import { Sprite } from "./Sprite/Sprite";
-import { SpriteModel } from "./Sprite/spriteModel";
+import {
+  SpriteEvent,
+  SpriteEventHandler,
+  SpriteModel,
+} from "./Sprite/spriteModel";
 import { Action } from "./AppState/actions";
 import { ControlPanel } from "./Controls/ControlPanel";
 
@@ -52,10 +56,14 @@ const applyMiddleware: (
 ) => ReducerT = (middlewares, reducer) =>
   middlewares.reduce((r, m) => m(r), reducer);
 
-const reducer = applyMiddleware([logger, saver], appStateReducer);
+const reducer = applyMiddleware([/*logger,*/ saver], appStateReducer);
+
+type SpriteDrawingState = { state: "none" | "drawing" | "erasing" };
 
 function App() {
   const [state, dispatch] = useReducer(reducer, defaultState);
+  const spriteDrawingStateRef = useRef<SpriteDrawingState>({ state: "none" });
+
   const selectedTile = state.tiles[state.name];
   const selectedPallet = state.pallets[selectedTile.palletIndex];
   const getColor = (palletIndex: number, colorIndex: number) =>
@@ -68,12 +76,37 @@ function App() {
     size: state.spriteSize[state.spriteSizeSelect],
   };
 
-  console.log("selected pixels:", state.selectedPixels);
+  const spriteEventHandler: SpriteEventHandler = (e) => {
+    switch (e.type) {
+      case "drawing":
+        spriteDrawingStateRef.current.state = "drawing";
+        break;
+      case "erasing":
+        spriteDrawingStateRef.current.state = "erasing";
+        break;
+      case "none":
+        spriteDrawingStateRef.current.state = "none";
+        break;
+      case "pixel-single":
+      case "pixel": {
+        if (e.type !== 'pixel-single' && spriteDrawingStateRef.current.state == "none") break;
+        const value =
+          spriteDrawingStateRef.current.state == "drawing" || "none"
+            ? state.selectedColorIndex
+            : 0;
+        dispatch({
+          type: "update-pixel",
+          payload: { pixelId: e.payload as PixelId, value },
+        });
+        break;
+      }
+    }
+  };
 
   return (
     <div className="App">
       <AppContext.Provider value={{ dispatch, getColor, getSelectedPixels }}>
-        <Sprite sprite={spriteModel} />
+        <Sprite sprite={spriteModel} spriteEventHandler={spriteEventHandler} />
         <Pallet
           pallet={selectedPallet}
           selectedColorIndex={state.selectedColorIndex}

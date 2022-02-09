@@ -1,11 +1,8 @@
 import { Color } from "../Pallet/palletModel";
+import { PixelId } from "../Tile/tileModel";
 import { SpriteSizes } from "./appState";
 
-export interface PixelId {
-  name: number
-  rowIndex: number
-  columnIndex: number
-}
+
 
 export interface DeselectPixelAction {
   type: "deselect-pixel";
@@ -67,6 +64,16 @@ export interface UpdatePalletColorAction {
   payload: UpdatePalletColorPayload;
 }
 
+export interface UpdatePixelPayload {
+  pixelId: PixelId
+  value: number
+}
+
+export interface UpdatePixelAction {
+  type: 'update-pixel'
+  payload: UpdatePixelPayload
+}
+
 export interface UpdateSpriteSizeAction {
   type: "update-sprite-size"
   payload: SpriteSizes
@@ -80,6 +87,7 @@ export type Action =
   | SpriteSizeSelectAction
   | UpdatePalletAction
   | UpdatePalletColorAction
+  | UpdatePixelAction
   | UpdateSpriteSizeAction
   | MouseOverPixelAction
   ;

@@ -1,18 +1,24 @@
 import React, { useContext, useState } from "react";
-import { TileModel } from "./tileModel";
+import { PixelId, TileModel } from "./tileModel";
 import "./tile.css";
 import { color2css } from "../Pallet/palletModel";
 import { AppContext } from "../AppState/appStateContext";
 import { debug } from "console";
+import { SpriteEventHandler } from "../Sprite/spriteModel";
 
 export interface TileProps {
   tile: TileModel;
   selectedPixels: [number, number][] | null;
   name: number;
+  spriteEventHandler: SpriteEventHandler;
 }
 
-export const Tile = ({ tile, selectedPixels, name }: TileProps) => {
-  console.log(tile);
+export const Tile = ({
+  tile,
+  selectedPixels,
+  name,
+  spriteEventHandler,
+}: TileProps) => {
   const { dispatch, getColor } = useContext(AppContext);
 
   const getClassName = (rowIndex: number, colIndex: number) =>
@@ -23,17 +29,17 @@ export const Tile = ({ tile, selectedPixels, name }: TileProps) => {
       ? "selected-pixel"
       : "pixel";
 
-  // const onTileClick = (e) =>
-  //   dispatch({
-  //     type: e.ctrlKey ? "select-another-pixel" : "select-pixel",
-  //     payload: { selectedPixels: [[rowIndex, colIndex]], name },
-  //   });
-  const onMouseOverPixel =
-    (rowIndex: number, colIndex: number) => (e: MouseEvent) =>
-      dispatch({
-        type: "mouse-over-pixel",
-        payload: { pixelId: {name, rowIndex, colIndex} },
-      });
+  const updatePixel =
+    (single: boolean) => (pixelId: PixelId) => (e: React.MouseEvent) =>
+      single
+        ? spriteEventHandler({
+            type: "pixel-single",
+            payload: pixelId,
+          })
+        : spriteEventHandler({
+            type: "pixel",
+            payload: pixelId,
+          });
 
   return (
     <div grid-area={`tile${name}`}>
@@ -41,14 +47,19 @@ export const Tile = ({ tile, selectedPixels, name }: TileProps) => {
         <tbody>
           {tile.pixels.map((row, rowIndex) => (
             <tr key={rowIndex} className="tile-row">
-              {row.map((pixel, colIndex) => (
+              {row.map((pixel, columnIndex) => (
                 <td
-                  key={colIndex}
-                  className={getClassName(rowIndex, colIndex)}
+                  key={columnIndex}
+                  className={getClassName(rowIndex, columnIndex)}
                   style={{
                     background: color2css(getColor(tile.palletIndex, pixel)),
                   }}
-                  onMouseOver
+                  onMouseOver={updatePixel(false)({
+                    name,
+                    rowIndex,
+                    columnIndex,
+                  })}
+                  onClick={updatePixel(true)({ name, rowIndex, columnIndex })}
                 />
               ))}
             </tr>
