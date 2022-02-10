@@ -14,6 +14,7 @@ import {
 } from "./Sprite/spriteModel";
 import { Action } from "./AppState/actions";
 import { ControlPanel } from "./Controls/ControlPanel";
+import { printState } from "./VRam/Snes9xStateParser";
 
 const localStorageKey = "snes-tile-state";
 
@@ -63,6 +64,8 @@ type SpriteDrawingState = { state: "none" | "drawing" | "erasing" };
 function App() {
   const [state, dispatch] = useReducer(reducer, defaultState);
   const spriteDrawingStateRef = useRef<SpriteDrawingState>({ state: "none" });
+
+  printState();
 
   const selectedTile = state.tiles[state.name];
   const selectedPallet = state.pallets[selectedTile.palletIndex];
