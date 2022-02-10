@@ -14,7 +14,7 @@ import {
 } from "./Sprite/spriteModel";
 import { Action } from "./AppState/actions";
 import { ControlPanel } from "./Controls/ControlPanel";
-import { printState } from "./VRam/Snes9xStateParser";
+import { printState } from "./VRam/snes9xStateParser";
 
 const localStorageKey = "snes-tile-state";
 

@@ -1,3 +1,5 @@
+import { getFieldOffset } from "./ppuOffsets";
+
 let stateJson = require("./state1.json");
 
 const btoUint8Array = (b64: string) => {
@@ -39,6 +41,7 @@ const parseFieldHeader: (a: Uint8Array, offset: number) => FieldHeader =
 const MAGIC_NUMBER_LENGTH = 13; // #!s9xsnp:\d{4}
 const FIELDS_OFFSET = 14;
 const FIELD_HEADER_LENGTH = 11; // \w{3}:\d{6}:0
+const PPU_OAM_OFFST = 0;
 
 export const parseState = (state: Uint8Array) => {
   let result = {};
@@ -52,12 +55,14 @@ export const parseState = (state: Uint8Array) => {
     result = {...result, [name]: new Uint8Array(state.buffer, offset + FIELD_HEADER_LENGTH, length)}
     offset += FIELD_HEADER_LENGTH + length;
   }
-  console.log(result);
+  return result;
 };
 
 export const printState = () => {
   const array = btoUint8Array(stateJson.state1);
   console.log(array);
-
-  parseState(array);
+  const state = parseState(array);
+  const OAMAddrOffset = getFieldOffset('OAMAddr');
+  const OAMDataOffset = getFieldOffset('OAMData');
+  console.log(OAMAddrOffset, OAMDataOffset);
 };
