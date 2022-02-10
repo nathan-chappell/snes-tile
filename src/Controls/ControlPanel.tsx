@@ -24,8 +24,6 @@ const spriteStringMap: { [spriteSizeString: string]: SpriteSizes } = {
 export const ControlPanel = ({
   state: { name, spriteSize, spriteSizeSelect },
 }: ControlPanelProps) => {
-  const { dispatch } = useContext(AppContext);
-
   const spriteSizeString = `${spriteSize[0]} - ${spriteSize[1]}`;
 
   return (
