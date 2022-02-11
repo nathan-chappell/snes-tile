@@ -1,4 +1,5 @@
-import { parsePPU } from "./ppuOffsets";
+import { off } from "process";
+import { parsePPU } from "./Parsing/parsePPU";
 
 let stateJson = require("./state1.json");
 
@@ -28,12 +29,11 @@ const uint8ArraySubstring = (a: Uint8Array, offset: number, count: number) =>
   uint8Array2string(new Uint8Array(a.buffer, offset, count));
 
 export interface FieldHeader {
-    name: string
-    length: number
+  name: string;
+  length: number;
 }
 
-const parseFieldHeader: (a: Uint8Array, offset: number) => FieldHeader = 
-    (a, offset) => ({
+const parseFieldHeader: (a: Uint8Array, offset: number) => FieldHeader = (a, offset) => ({
   name: uint8ArraySubstring(a, offset, 3),
   length: parseInt(uint8ArraySubstring(a, offset + 4, 6)),
 });
@@ -43,16 +43,32 @@ const FIELDS_OFFSET = 14;
 const FIELD_HEADER_LENGTH = 11; // \w{3}:\d{6}:0
 const PPU_OAM_OFFST = 0;
 
-export const parseState = (state: Uint8Array) => {
+export interface Snes9xState {
+  magic: string;
+  NAM: Uint8Array;
+  CPU: Uint8Array;
+  REG: Uint8Array;
+  PPU: Uint8Array;
+  DMA: Uint8Array;
+  VRA: Uint8Array;
+  RAM: Uint8Array;
+  SRA: Uint8Array;
+  FIL: Uint8Array;
+  SND: Uint8Array;
+  CTL: Uint8Array;
+  TIM: Uint8Array;
+}
+
+export const parseState: (buffer: Uint8Array, offset?: number) => Snes9xState = (buffer, offset = 0) => {
   let result: any = {};
-  const magic = uint8ArraySubstring(state, 0, MAGIC_NUMBER_LENGTH);
+  const magic = uint8ArraySubstring(buffer, offset, MAGIC_NUMBER_LENGTH);
   console.log(magic);
   result = { ...result, magic };
-  let offset = FIELDS_OFFSET;
-  while (offset < state.length) {
-    const { name, length } = parseFieldHeader(state, offset);
+  offset += FIELDS_OFFSET;
+  while (offset < buffer.length) {
+    const { name, length } = parseFieldHeader(buffer, offset);
     console.log(name, length);
-    result = {...result, [name]: new Uint8Array(state.buffer, offset + FIELD_HEADER_LENGTH, length)}
+    result = { ...result, [name]: new Uint8Array(buffer.buffer, offset + FIELD_HEADER_LENGTH, length) };
     offset += FIELD_HEADER_LENGTH + length;
   }
   console.log(result);
@@ -65,8 +81,8 @@ export const printState = () => {
   const array = btoUint8Array(stateJson.state1);
   console.log(array);
   const state = parseState(array);
-//   const ppu = parsePPU(state.PPU)
-//   const OAMAddrOffset = getFieldOffset('OAMAddr');
-//   const OAMDataOffset = getFieldOffset('OAMData');
-//   console.log(OAMAddrOffset, OAMDataOffset);
+  //   const ppu = parsePPU(state.PPU)
+  //   const OAMAddrOffset = getFieldOffset('OAMAddr');
+  //   const OAMDataOffset = getFieldOffset('OAMData');
+  //   console.log(OAMAddrOffset, OAMDataOffset);
 };
