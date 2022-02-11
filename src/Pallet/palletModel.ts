@@ -2,10 +2,10 @@ export type Color = [number, number, number];
 export type Pallet = Color[];
 
 export const number2rgb = (c: number) => {
-    let _c = Math.min(c * 8, 255);
-    let rgb = _c.toString(16);
-    if (rgb.length < 2)
-        rgb = '0' + rgb;
+    const _c = Math.min(c * 8, 255);
+    const rgb = _c.toString(16);
+    if (rgb.length === 1)
+        return '0' + rgb;
     return rgb;
 }
 

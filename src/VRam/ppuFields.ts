@@ -1,4 +1,4 @@
-import { Field, SimpleStruct } from "./ppuFieldTypes";
+import { Field, SimpleStruct, StructType } from "./ppuFieldTypes";
 
 export const VMA: SimpleStruct = [
   { name: "High", type: "bool8" },
@@ -29,7 +29,7 @@ export const SOBJ: SimpleStruct = [
   { name: "Size", type: "uint8" },
 ];
 
-export const structNameMap = {
+export const structNameMap: {[name in StructType]: SimpleStruct} = {
   VMA,
   BG,
   SOBJ,

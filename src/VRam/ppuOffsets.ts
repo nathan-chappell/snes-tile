@@ -1,10 +1,14 @@
-import { BG, ppuFields, SOBJ, VMA } from "./ppuFields";
+import { BG, ppuFields, SOBJ, structNameMap, VMA } from "./ppuFields";
 import {
   ArrayField,
+  Field,
   FieldSizeMap,
   FieldType,
-  SimpleField,
-  SimpleStruct,
+  isArrayField,
+  isPrimitiveField,
+  isStructField,
+  PrimitiveField,
+  PrimitiveStruct,
 } from "./ppuFieldTypes";
 
 export let fieldSizeMap: FieldSizeMap = {
@@ -19,7 +23,7 @@ export let fieldSizeMap: FieldSizeMap = {
   SOBJ: 0,
 };
 
-const getStructSize = (simpleStruct: SimpleStruct) =>
+const getStructSize = (simpleStruct: PrimitiveStruct) =>
   simpleStruct.reduce((acc, field) => {
     let size = fieldSizeMap[field.type];
     if (typeof size === "number") {
@@ -42,7 +46,7 @@ export const getFieldOffset = (fieldName: string) => {
     if (ppuFields[i].name === fieldName) {
       return offset;
     } else if ("type" in ppuFields[i]) {
-      let simpleField = ppuFields[i] as SimpleField;
+      let simpleField = ppuFields[i] as PrimitiveField;
       offset += fieldSizeMap[simpleField.type];
     } else if ("arrayType" in ppuFields[i]) {
       let arrayField = ppuFields[i] as ArrayField;
@@ -50,3 +54,22 @@ export const getFieldOffset = (fieldName: string) => {
     }
   }
 };
+
+export const getAllFieldOffsets = (fields: Field[], startingOffset = 0) =>
+  fields.reduce((offsets, field) => {
+    if (isPrimitiveField(field)) {
+      return {
+        ...offsets,
+        [field.name]: offsets.nextOffset,
+        nextOffset: offsets.nextOffset + fieldSizeMap[field.type]
+      }
+    } else if (isStructField(field)) {
+      const structOffsets = getAllFieldOffsets(structNameMap[field.type], startingOffset = 0)
+      return {
+        ...offsets,
+        [field.name]: offsets.nextOffset,
+        nextOffset: offsets.nextOffset + fieldSizeMap[field.type]
+      }
+    }
+    return offsets;
+  }, { nextOffset: 0 });
