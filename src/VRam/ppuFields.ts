@@ -1,6 +1,6 @@
-import { Field, SimpleStruct, StructType } from "./ppuFieldTypes";
+import { Field, PPUStructTypeName, PrimitiveField } from "./ppuFieldTypes";
 
-export const VMA: SimpleStruct = [
+export const VMAFields: PrimitiveField[] = [
   { name: "High", type: "bool8" },
   { name: "Increment", type: "uint8" },
   { name: "Address", type: "uint16" },
@@ -9,7 +9,7 @@ export const VMA: SimpleStruct = [
   { name: "Shift", type: "uint16" },
 ];
 
-export const BG: SimpleStruct = [
+export const BGFields: PrimitiveField[] = [
   { name: "SCBase", type: "uint16" },
   { name: "HOffset", type: "uint16" },
   { name: "VOffset", type: "uint16" },
@@ -18,7 +18,7 @@ export const BG: SimpleStruct = [
   { name: "SCSize", type: "uint16" },
 ];
 
-export const SOBJ: SimpleStruct = [
+export const SOBJFields: PrimitiveField[] = [
   { name: "HPos", type: "int16" },
   { name: "VPos", type: "uint16" },
   { name: "HFlip", type: "uint8" },
@@ -29,13 +29,13 @@ export const SOBJ: SimpleStruct = [
   { name: "Size", type: "uint8" },
 ];
 
-export const structNameMap: {[name in StructType]: SimpleStruct} = {
-  VMA,
-  BG,
-  SOBJ,
+export const structNameMap: {[name in PPUStructTypeName]: PrimitiveField[]} = {
+  VMA: VMAFields,
+  BG: BGFields,
+  SOBJ: SOBJFields,
 };
 
-export const ppuFields: Field[] = [
+export const PPUFields: Field[] = [
   { name: "VMA", type: "VMA" },
   { name: "WRAM", type: "uint32" },
   { name: "BG", arrayType: "BG", length: 4 },

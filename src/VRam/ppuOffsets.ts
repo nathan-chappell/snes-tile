@@ -1,17 +1,17 @@
-import { BG, ppuFields, SOBJ, structNameMap, VMA } from "./ppuFields";
+import { BGFields, PPUFields, SOBJFields, structNameMap, VMAFields } from "./ppuFields";
 import {
   ArrayField,
-  Field,
-  FieldSizeMap,
-  FieldType,
+  PPUField,
+  PPUFieldSizeMap,
+  PPUFieldType,
   isArrayField,
   isPrimitiveField,
-  isStructField,
+  isPPUStructField,
   PrimitiveField,
   PrimitiveStruct,
 } from "./ppuFieldTypes";
 
-export let fieldSizeMap: FieldSizeMap = {
+export let fieldSizeMap: PPUFieldSizeMap = {
   uint8: 1,
   bool8: 1,
   int16: 2,
@@ -35,27 +35,27 @@ const getStructSize = (simpleStruct: PrimitiveStruct) =>
 
 fieldSizeMap = {
   ...fieldSizeMap,
-  VMA: getStructSize(VMA),
-  BG: getStructSize(BG),
-  SOBJ: getStructSize(SOBJ),
+  VMA: getStructSize(VMAFields),
+  BG: getStructSize(BGFields),
+  SOBJ: getStructSize(SOBJFields),
 };
 
 export const getFieldOffset = (fieldName: string) => {
   let offset = 0;
-  for (let i = 0; i < ppuFields.length; ++i) {
-    if (ppuFields[i].name === fieldName) {
+  for (let i = 0; i < PPUFields.length; ++i) {
+    if (PPUFields[i].name === fieldName) {
       return offset;
-    } else if ("type" in ppuFields[i]) {
-      let simpleField = ppuFields[i] as PrimitiveField;
+    } else if ("type" in PPUFields[i]) {
+      let simpleField = PPUFields[i] as PrimitiveField;
       offset += fieldSizeMap[simpleField.type];
-    } else if ("arrayType" in ppuFields[i]) {
-      let arrayField = ppuFields[i] as ArrayField;
+    } else if ("arrayType" in PPUFields[i]) {
+      let arrayField = PPUFields[i] as ArrayField;
       offset += fieldSizeMap[arrayField.arrayType] * arrayField.length;
     }
   }
 };
 
-export const getAllFieldOffsets = (fields: Field[], startingOffset = 0) =>
+export const getAllFieldOffsets = (fields: PPUField[], startingOffset = 0) =>
   fields.reduce((offsets, field) => {
     if (isPrimitiveField(field)) {
       return {
@@ -63,7 +63,7 @@ export const getAllFieldOffsets = (fields: Field[], startingOffset = 0) =>
         [field.name]: offsets.nextOffset,
         nextOffset: offsets.nextOffset + fieldSizeMap[field.type]
       }
-    } else if (isStructField(field)) {
+    } else if (isPPUStructField(field)) {
       const structOffsets = getAllFieldOffsets(structNameMap[field.type], startingOffset = 0)
       return {
         ...offsets,

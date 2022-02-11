@@ -1,4 +1,4 @@
-import { BG, ppuFields, SOBJ, VMA } from "./ppuFields";
+import { BGFields, PPUFields, SOBJFields, VMAFields } from "./ppuFields";
 
 export type PrimitiveTypeName =
   | "bool8"
@@ -17,22 +17,22 @@ const PrimitiveTypeNames: PrimitiveTypeName[] = [
   "uint32",
 ]
 
-export type StructTypeName = "VMA" | "BG" | "SOBJ";
+export type PPUStructTypeName = "VMA" | "BG" | "SOBJ";
 
-const StructTypeNames: StructTypeName[] = ["VMA", "BG", "SOBJ"];
+const StructTypeNames: PPUStructTypeName[] = ["VMA", "BG", "SOBJ"];
 
-export type FieldType = PrimitiveTypeName | StructTypeName;
+export type PPUFieldType = PrimitiveTypeName | PPUStructTypeName;
 
-export type FieldSizeMap = { [name in FieldType]: number };
+export type PPUFieldSizeMap = { [name in PPUFieldType]: number };
 
 export interface PrimitiveField {
   name: string;
   type: PrimitiveTypeName;
 }
 
-export interface StructField {
+export interface PPUStructField {
   name: string;
-  type: StructTypeName;
+  type: PPUStructTypeName;
 }
 
 export interface PrimitiveArrayField {
@@ -41,25 +41,25 @@ export interface PrimitiveArrayField {
   length: number;
 }
 
-export interface StructArrayField {
+export interface PPUStructArrayField {
   name: string;
-  arrayType: StructTypeName;
+  arrayType: PPUStructTypeName;
   length: number;
 }
 
-export type Field = PrimitiveField | StructField | PrimitiveArrayField | StructArrayField;
+export type PPUField = PrimitiveField | PPUStructField | PrimitiveArrayField | PPUStructArrayField;
 
-export function isPrimitiveField(field: Field): field is PrimitiveField {
+export function isPrimitiveField(field: PPUField): field is PrimitiveField {
   return PrimitiveTypeNames.indexOf((field as PrimitiveField).type) !== -1;
 }
-export function isStructField(field: Field): field is StructField {
-  return StructTypeNames.indexOf((field as StructField).type) !== -1;
+export function isPPUStructField(field: PPUField): field is PPUStructField {
+  return StructTypeNames.indexOf((field as PPUStructField).type) !== -1;
 }
-export function isPrimitiveArrayField(field: Field): field is PrimitiveArrayField {
+export function isPrimitiveArrayField(field: PPUField): field is PrimitiveArrayField {
   return PrimitiveTypeNames.indexOf((field as PrimitiveArrayField).arrayType) !== -1;
 }
-export function isStructArrayField(field: Field): field is StructArrayField {
-  return StructTypeNames.indexOf((field as StructArrayField).arrayType) !== -1;
+export function isPPUStructArrayField(field: PPUField): field is PPUStructArrayField {
+  return StructTypeNames.indexOf((field as PPUStructArrayField).arrayType) !== -1;
 }
 
 
