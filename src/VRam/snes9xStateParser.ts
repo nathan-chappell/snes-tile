@@ -1,4 +1,4 @@
-import { getFieldOffset } from "./ppuOffsets";
+import { parsePPU } from "./ppuOffsets";
 
 let stateJson = require("./state1.json");
 
@@ -44,7 +44,7 @@ const FIELD_HEADER_LENGTH = 11; // \w{3}:\d{6}:0
 const PPU_OAM_OFFST = 0;
 
 export const parseState = (state: Uint8Array) => {
-  let result = {};
+  let result: any = {};
   const magic = uint8ArraySubstring(state, 0, MAGIC_NUMBER_LENGTH);
   console.log(magic);
   result = { ...result, magic };
@@ -55,6 +55,9 @@ export const parseState = (state: Uint8Array) => {
     result = {...result, [name]: new Uint8Array(state.buffer, offset + FIELD_HEADER_LENGTH, length)}
     offset += FIELD_HEADER_LENGTH + length;
   }
+  console.log(result);
+  const ppu = parsePPU(result.PPU as Uint8Array, 0);
+  console.log(ppu);
   return result;
 };
 
@@ -62,7 +65,8 @@ export const printState = () => {
   const array = btoUint8Array(stateJson.state1);
   console.log(array);
   const state = parseState(array);
-  const OAMAddrOffset = getFieldOffset('OAMAddr');
-  const OAMDataOffset = getFieldOffset('OAMData');
-  console.log(OAMAddrOffset, OAMDataOffset);
+//   const ppu = parsePPU(state.PPU)
+//   const OAMAddrOffset = getFieldOffset('OAMAddr');
+//   const OAMDataOffset = getFieldOffset('OAMData');
+//   console.log(OAMAddrOffset, OAMDataOffset);
 };

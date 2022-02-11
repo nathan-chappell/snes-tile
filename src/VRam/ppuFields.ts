@@ -1,4 +1,4 @@
-import { Field, PPUStructTypeName, PrimitiveField } from "./ppuFieldTypes";
+import { PPUField, PPUStructTypeName, PrimitiveField } from "./ppuFieldTypes";
 
 export const VMAFields: PrimitiveField[] = [
   { name: "High", type: "bool8" },
@@ -29,13 +29,13 @@ export const SOBJFields: PrimitiveField[] = [
   { name: "Size", type: "uint8" },
 ];
 
-export const structNameMap: {[name in PPUStructTypeName]: PrimitiveField[]} = {
+export const PPUStructName2FieldsMap: {[name in PPUStructTypeName]: PrimitiveField[]} = {
   VMA: VMAFields,
   BG: BGFields,
   SOBJ: SOBJFields,
 };
 
-export const PPUFields: Field[] = [
+export const PPUFields: PPUField[] = [
   { name: "VMA", type: "VMA" },
   { name: "WRAM", type: "uint32" },
   { name: "BG", arrayType: "BG", length: 4 },

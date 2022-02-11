@@ -61,6 +61,3 @@ export function isPrimitiveArrayField(field: PPUField): field is PrimitiveArrayF
 export function isPPUStructArrayField(field: PPUField): field is PPUStructArrayField {
   return StructTypeNames.indexOf((field as PPUStructArrayField).arrayType) !== -1;
 }
-
-
-// export type PrimitiveStruct = PrimitiveField[];
