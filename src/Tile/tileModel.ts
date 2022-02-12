@@ -1,10 +1,5 @@
-// import { Pallet, makeDefaultPallet } from "../Pallet/pallet"
-
-import { Tile } from "./Tile";
-
 export type Pixel = number;
 export type TileSize = [8, 8];
-// export type PixelId = [number, number, number]; // [name,row,column]
 
 export interface PixelId {
   name: number;

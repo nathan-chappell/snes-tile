@@ -8,11 +8,11 @@ type PrimitiveStruct = { [fieldName: string]: number };
 
 export const parsePPU: (buffer: Uint8Array, offset: number) => PPU = (buffer, offset = 0) => {
   // parse VMA first to pass it in to initial PPU
-  let vma: VMA;
-  [vma, offset] = parseVMA(buffer, offset);
+  const vmaParseResult = parseVMA(buffer, offset);
+  offset = vmaParseResult.offset;
 
   let result: PPU = {
-    VMA: vma,
+    VMA: vmaParseResult.result,
     WRAM: 0,
     BG: [],
     BGMode: 0,
@@ -97,15 +97,15 @@ export const parsePPU: (buffer: Uint8Array, offset: number) => PPU = (buffer, of
   for (let i = 1; i < PPUFields.length; ++i) {
     const field = PPUFields[i];
     if (isPrimitiveField(field)) {
-      let value: number;
-      [value, offset] = parsePrimitiveField(buffer, offset, field.type);
-      (result as any)[field.name] = value;
+      const parseResult = parsePrimitiveField(buffer, offset, field.type);
+      offset = parseResult.offset;
+      (result as any)[field.name] = parseResult.result;
     } else if (isPrimitiveArrayField(field)) {
       let arrayValue: number[] = [];
       for (let i = 0; i < field.length; ++i) {
-        let value: number;
-        [value, offset] = parsePrimitiveField(buffer, offset, field.arrayType);
-        arrayValue.push(value);
+        const parseResult = parsePrimitiveField(buffer, offset, field.arrayType);
+        offset = parseResult.offset;
+        arrayValue.push(parseResult.result);
       }
       (result as any)[field.name] = arrayValue;
     } else if (isPPUStructField(field)) {
@@ -116,9 +116,9 @@ export const parsePPU: (buffer: Uint8Array, offset: number) => PPU = (buffer, of
       for (let i = 0; i < field.length; ++i) {
         let struct: PrimitiveStruct = {};
         for (let fieldIndex = 0; fieldIndex < structFields.length; ++fieldIndex) {
-          let value: number;
-          [value, offset] = parsePrimitiveField(buffer, offset, structFields[fieldIndex].type);
-          struct[structFields[fieldIndex].name] = value;
+          const parseResult = parsePrimitiveField(buffer, offset, structFields[fieldIndex].type);
+          offset = parseResult.offset;
+          struct[structFields[fieldIndex].name] = parseResult.result;
         }
         arrayValue.push(struct);
       }
