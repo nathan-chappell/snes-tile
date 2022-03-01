@@ -1,7 +1,10 @@
-import { off } from "process";
+import { TileModel } from "../Tile/tileModel";
 import { parsePPU } from "./Parsing/parsePPU";
+import { parseTiles } from "./Parsing/parseTile";
+import { PPU } from "./ppu";
 
-let stateJson = require("./state1.json");
+// let stateJson = require("./smw.state3.json");
+let stateJson = require("./super_metroid.state18.json");
 
 const btoUint8Array = (b64: string) => {
   const s = atob(b64);
@@ -33,7 +36,10 @@ export interface FieldHeader {
   length: number;
 }
 
-const parseFieldHeader: (a: Uint8Array, offset: number) => FieldHeader = (a, offset) => ({
+const parseFieldHeader: (a: Uint8Array, offset: number) => FieldHeader = (
+  a,
+  offset
+) => ({
   name: uint8ArraySubstring(a, offset, 3),
   length: parseInt(uint8ArraySubstring(a, offset + 4, 6)),
 });
@@ -59,26 +65,55 @@ export interface Snes9xState {
   TIM: Uint8Array;
 }
 
-export const parseState: (buffer: Uint8Array, offset?: number) => Snes9xState = (buffer, offset = 0) => {
-  let result: any = {};
+interface ParseStateResult {
+  snes9xState: Snes9xState;
+  tiles: TileModel[];
+  ppu: PPU;
+}
+
+export const parseState: (
+  buffer?: Uint8Array,
+  offset?: number,
+  nameBase?: number
+) => ParseStateResult = (
+  buffer = btoUint8Array(stateJson.state),
+  offset = 0,
+  nameBase = 0
+) => {
+  let snes9xState: any = {};
   const magic = uint8ArraySubstring(buffer, offset, MAGIC_NUMBER_LENGTH);
   console.log(magic);
-  result = { ...result, magic };
+  snes9xState = { ...snes9xState, magic };
   offset += FIELDS_OFFSET;
   while (offset < buffer.length) {
     const { name, length } = parseFieldHeader(buffer, offset);
     console.log(name, length);
-    result = { ...result, [name]: new Uint8Array(buffer.buffer, offset + FIELD_HEADER_LENGTH, length) };
+    snes9xState = {
+      ...snes9xState,
+      [name]: new Uint8Array(
+        buffer.buffer,
+        offset + FIELD_HEADER_LENGTH,
+        length
+      ),
+    };
     offset += FIELD_HEADER_LENGTH + length;
   }
-  console.log(result);
-  const ppu = parsePPU(result.PPU as Uint8Array, 0);
+  console.log(snes9xState);
+  const ppu = parsePPU(snes9xState.PPU as Uint8Array, 0);
   console.log(ppu);
-  return result;
+  const objVramOffset = (ppu.OBJNameBase << 13) + (ppu.OBJNameSelect << 12);
+  console.log("objVramOffset: 0x" + objVramOffset.toString(16));
+  const tilesParseResult = parseTiles(
+    (snes9xState as Snes9xState).VRA,
+    nameBase
+    // objVramOffset + 550 * 32//  + 890 * 32
+  );
+  console.log(tilesParseResult);
+  return { snes9xState, tiles: tilesParseResult.result, ppu };
 };
 
 export const printState = () => {
-  const array = btoUint8Array(stateJson.state1);
+  const array = btoUint8Array(stateJson.state);
   console.log(array);
   const state = parseState(array);
   //   const ppu = parsePPU(state.PPU)

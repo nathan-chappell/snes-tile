@@ -7,6 +7,7 @@ import { SpriteSizeSelectCheckbox } from "./SpriteSizeSelectCheckbox";
 import { SpriteSizeSelect } from "./SpriteSizeSelect";
 import { NameInput } from "./NameInput";
 import { SaveAndLoadTiles } from "./SaveAndLoadTiles";
+import { LoadFromSaveState } from "./LoadFromSaveState";
 
 export interface ControlPanelProps {
   state: AppState;
@@ -22,7 +23,7 @@ const spriteStringMap: { [spriteSizeString: string]: SpriteSizes } = {
 };
 
 export const ControlPanel = ({
-  state: { name, spriteSize, spriteSizeSelect },
+  state: { name, nameBase, spriteSize, spriteSizeSelect },
 }: ControlPanelProps) => {
   const spriteSizeString = `${spriteSize[0]} - ${spriteSize[1]}`;
 
@@ -31,8 +32,9 @@ export const ControlPanel = ({
       <DeselectPixel />
       <SpriteSizeSelectCheckbox spriteSizeSelect={spriteSizeSelect} />
       <SpriteSizeSelect spriteSizeString={spriteSizeString} />
-      <NameInput name={name} />
+      <NameInput name={name} nameBase={nameBase} />
       <SaveAndLoadTiles />
+      <LoadFromSaveState nameBase={nameBase} />
     </div>
   );
 };

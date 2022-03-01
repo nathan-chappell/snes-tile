@@ -14,27 +14,31 @@ import {
 } from "./Sprite/spriteModel";
 import { Action } from "./AppState/actions";
 import { ControlPanel } from "./Controls/ControlPanel";
-import { printState } from "./VRam/snes9xStateParser";
+import { parseState, printState } from "./VRam/snes9xStateParser";
 
 const localStorageKey = "snes-tile-state";
 
 const initialState: AppState = {
   drawingState: "none",
   name: 0,
+  nameBase: 0,
   pallets: [...Array(8)].map(() => makeDefaultPallet()),
   selectedPalletIndex: 0,
   selectedColorIndex: 1,
   selectedPixels: [],
-  spriteSize: [8, 16],
-  spriteSizeSelect: 0,
-  tiles: [...Array(64 * 64)].map(() => makeDefaultTile()),
+  spriteSize: [32, 64],
+  spriteSizeSelect: 1,
+  // tiles: [...Array(64 * 64)].map(() => makeDefaultTile()),
+  tiles: [],
+  vram: new Uint8Array(),
 };
 
 const savedState: AppState = JSON.parse(
   localStorage.getItem(localStorageKey) ?? "{}"
 );
 
-export const defaultState = { ...initialState, ...savedState };
+// export const defaultState = { ...initialState, ...savedState };
+export const defaultState = { ...initialState };
 
 type ReducerT = (state: AppState, action: Action) => AppState;
 
@@ -57,41 +61,51 @@ const applyMiddleware: (
 ) => ReducerT = (middlewares, reducer) =>
   middlewares.reduce((r, m) => m(r), reducer);
 
-const reducer = applyMiddleware([/*logger,*/ saver], appStateReducer);
+const reducer = applyMiddleware([logger], appStateReducer);
 
 type SpriteDrawingState = { state: "none" | "drawing" | "erasing" };
 
 function App() {
   const [state, dispatch] = useReducer(reducer, defaultState);
   const spriteDrawingStateRef = useRef<SpriteDrawingState>({ state: "none" });
+  
+  let onKeyHandler = (e: KeyboardEvent) => {
+    if ("0" <= e.key && e.key <= "9") {
+      e.preventDefault();
+      dispatch({ type: "select-pallet", payload: parseInt(e.key) });
+    } else if (e.key === 'PageUp') {
+      dispatch({type: 'select-name', payload: state.name + 16})
+    } else if (e.key === 'PageDown') {
+      dispatch({type: 'select-name', payload: state.name - 16})
+    }
+  };
+  
+  useEffect(() => {
+    document.addEventListener("keydown", onKeyHandler);
+    return () => document.removeEventListener("keydown", onKeyHandler);
+  });
 
-  printState();
+  // printState();
+  if (state.tiles.length === 0) {
+    const parseStateResult = parseState();
+    dispatch({ type: "set-tiles", payload: parseStateResult.tiles });
+    return <div>Loading Tiles</div>
+  }
 
   const selectedTile = state.tiles[state.name];
   const selectedPallet = state.pallets[selectedTile.palletIndex];
   const getColor = (palletIndex: number, colorIndex: number) =>
     state.pallets[palletIndex][colorIndex];
-  
-  const getSelectedPixels = (name: number) => state.selectedPixels.filter(pixelId => pixelId.name == name);
+
+  const getSelectedPixels = (name: number) =>
+    state.selectedPixels.filter((pixelId) => pixelId.name == name);
 
   const spriteModel: SpriteModel = {
     tiles: state.tiles,
     name: state.name,
     size: state.spriteSize[state.spriteSizeSelect],
   };
-
-  let onKeyHandler = (e: KeyboardEvent) => {
-    if ('0' <= e.key && e.key <= '9') {
-      e.preventDefault();
-      dispatch({type:'select-pallet', payload: parseInt(e.key)})
-    }
-  }
-  useEffect(() => {
-    document.addEventListener('keydown', onKeyHandler);
-    return () => document.removeEventListener('keydown', onKeyHandler);
-  })
-
-
+  
   const spriteEventHandler: SpriteEventHandler = (e) => {
     switch (e.type) {
       case "drawing":
@@ -105,7 +119,11 @@ function App() {
         break;
       case "pixel-single":
       case "pixel": {
-        if (e.type !== 'pixel-single' && spriteDrawingStateRef.current.state == "none") break;
+        if (
+          e.type !== "pixel-single" &&
+          spriteDrawingStateRef.current.state == "none"
+        )
+          break;
         const value =
           spriteDrawingStateRef.current.state == "drawing"
             ? state.selectedColorIndex

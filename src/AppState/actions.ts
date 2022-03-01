@@ -33,6 +33,11 @@ export interface SelectNameAction {
   payload: number;
 }
 
+export interface SelectNameBaseAction {
+  type: "select-name-base";
+  payload: number;
+}
+
 export type SelectPalletPayload = number;
 
 export interface SelectPalletAction {
@@ -43,6 +48,16 @@ export interface SelectPalletAction {
 export interface SelectPixelAction {
   type: "select-pixel" | "select-another-pixel";
   payload: PixelId[];
+}
+
+export interface SetTilesAction {
+  type: "set-tiles";
+  payload: TileModel[];
+}
+
+export interface SetVramAction {
+  type: "set-vram";
+  payload: Uint8Array;
 }
 
 export interface SpriteSizeSelectAction {
@@ -93,8 +108,11 @@ export type Action =
   | SaveTilesAction
   | SelectColorAction
   | SelectNameAction
+  | SelectNameBaseAction
   | SelectPalletAction
   | SelectPixelAction
+  | SetTilesAction
+  | SetVramAction
   | SpriteSizeSelectAction
   | UpdatePalletAction
   | UpdatePalletColorAction

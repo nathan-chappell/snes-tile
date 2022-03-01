@@ -2,6 +2,7 @@ import { off } from "process";
 import { Color, Pallet } from "../Pallet/palletModel";
 import { SpriteSize } from "../Sprite/spriteModel";
 import { cloneTile, PixelId, TileModel } from "../Tile/tileModel";
+import { parseState } from "../VRam/snes9xStateParser";
 import { Action } from "./actions";
 
 export type SpriteSizes =
@@ -17,6 +18,7 @@ export type DrawingState = "none" | "drawing" | "erasing";
 export interface AppState {
   drawingState: DrawingState;
   name: number;
+  nameBase: number;
   pallets: Pallet[];
   selectedColorIndex: number;
   selectedPalletIndex: number;
@@ -24,6 +26,7 @@ export interface AppState {
   spriteSize: SpriteSizes;
   spriteSizeSelect: 0 | 1;
   tiles: TileModel[];
+  vram: Uint8Array;
 }
 
 const getCurrentTiles: (state: AppState) => [number, TileModel][] = ({
@@ -119,8 +122,8 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (
       }
     }
 
-    case "save-tiles":{
-      const a = document.createElement('a');
+    case "save-tiles": {
+      const a = document.createElement("a");
       const url = URL.createObjectURL(new Blob([JSON.stringify(state.tiles)]));
       a.href = url;
       a.download = "tiles.json";
@@ -146,6 +149,14 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (
         name: action.payload,
       };
 
+    case "select-name-base":
+      
+      return {
+        ...state,
+        nameBase: action.payload,
+        tiles: parseState(state.vram, 0, action.payload).tiles,
+      };
+
     case "select-pallet": {
       const nextState = { ...state, selectedColorIndex: action.payload };
       if (action.payload == state.selectedColorIndex) {
@@ -169,6 +180,18 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (
         //   ...state.selectedPixels,
         //   [action.payload.name]: action.payload.selectedPixels,
         // },
+      };
+
+    case "set-tiles":
+      return {
+        ...state,
+        tiles: action.payload,
+      };
+
+    case "set-vram":
+      return {
+        ...state,
+        vram: action.payload,
       };
 
     case "sprite-size-select":
