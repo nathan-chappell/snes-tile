@@ -19,7 +19,7 @@ export const Tile = ({
   name,
   spriteEventHandler,
 }: TileProps) => {
-  const { dispatch, getColor } = useContext(AppContext);
+  const { dispatch, getColor, getColorFromSelectedPallet } = useContext(AppContext);
 
   const getClassName = (rowIndex: number, colIndex: number) =>
     selectedPixels?.find(
@@ -51,7 +51,8 @@ export const Tile = ({
                   key={columnIndex}
                   className={getClassName(rowIndex, columnIndex)}
                   style={{
-                    background: color2css(getColor(tile.palletIndex, pixel)),
+                    // background: color2css(getColor(tile.palletIndex, pixel)),
+                    background: color2css(getColorFromSelectedPallet(pixel)),
                   }}
                   onMouseOver={updatePixel(false)({
                     name,

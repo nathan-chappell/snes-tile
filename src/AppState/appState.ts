@@ -5,13 +5,7 @@ import { cloneTile, PixelId, TileModel } from "../Tile/tileModel";
 import { parseState } from "../VRam/snes9xStateParser";
 import { Action } from "./actions";
 
-export type SpriteSizes =
-  | [8, 16]
-  | [8, 32]
-  | [8, 64]
-  | [16, 32]
-  | [16, 64]
-  | [32, 64];
+export type SpriteSizes = [8, 16] | [8, 32] | [8, 64] | [16, 32] | [16, 64] | [32, 64];
 
 export type DrawingState = "none" | "drawing" | "erasing";
 
@@ -29,12 +23,7 @@ export interface AppState {
   stateBytes: Uint8Array;
 }
 
-const getCurrentTiles: (state: AppState) => [number, TileModel][] = ({
-  spriteSize,
-  spriteSizeSelect,
-  tiles,
-  name,
-}) => {
+const getCurrentTiles: (state: AppState) => [number, TileModel][] = ({ spriteSize, spriteSizeSelect, tiles, name }) => {
   const dotsPerTile = spriteSize[spriteSizeSelect];
   let result: [number, TileModel][] = [];
   for (let i = 0; i < dotsPerTile / 8; ++i) {
@@ -53,11 +42,7 @@ const getPixelsForCurrentPallet: (state: AppState) => PixelId[] = (state) => {
     if (tiles[name].palletIndex != selectedPalletIndex) continue;
 
     for (let rowIndex = 0; rowIndex < tiles[name].pixels.length; ++rowIndex) {
-      for (
-        let columnIndex = 0;
-        columnIndex < tiles[name].pixels.length;
-        ++columnIndex
-      ) {
+      for (let columnIndex = 0; columnIndex < tiles[name].pixels.length; ++columnIndex) {
         if (tiles[name].pixels[rowIndex][columnIndex] == selectedColorIndex) {
           selectedPixels.push({ name, rowIndex, columnIndex });
         }
@@ -73,10 +58,7 @@ const updatePallet = (pallet: Pallet, colorIndex: number, color: Color) => [
   ...pallet.slice(colorIndex + 1),
 ];
 
-export const appStateReducer: (state: AppState, action: Action) => AppState = (
-  state,
-  action
-) => {
+export const appStateReducer: (state: AppState, action: Action) => AppState = (state, action) => {
   switch (action.type) {
     case "deselect-pixel":
       return {
@@ -150,14 +132,13 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (
       };
 
     case "select-name-base":
-      
       return {
         ...state,
         nameBase: action.payload,
         tiles: parseState(state.stateBytes, 0, action.payload).tiles,
       };
 
-    case "select-pallet": {
+    case "select-color": {
       const nextState = { ...state, selectedColorIndex: action.payload };
       if (action.payload == state.selectedColorIndex) {
         return appStateReducer(nextState, {
@@ -171,6 +152,12 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (
         });
       }
     }
+
+    case "select-pallet":
+      return {
+        ...state,
+        selectedPalletIndex: action.payload,
+      };
 
     case "select-pixel":
       return {

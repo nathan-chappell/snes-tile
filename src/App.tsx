@@ -72,7 +72,7 @@ function App() {
   let onKeyHandler = (e: KeyboardEvent) => {
     if ("0" <= e.key && e.key <= "9") {
       e.preventDefault();
-      dispatch({ type: "select-pallet", payload: parseInt(e.key) });
+      dispatch({ type: "select-color", payload: parseInt(e.key) });
     } else if (e.key === 'PageUp') {
       dispatch({type: 'select-name', payload: state.name + 16})
     } else if (e.key === 'PageDown') {
@@ -99,6 +99,7 @@ function App() {
     let result = state.pallets[palletIndex][colorIndex];
     return result;
   }
+  const getColorFromSelectedPallet = (colorIndex: number) => getColor(state.selectedPalletIndex, colorIndex);
 
   const getSelectedPixels = (name: number) =>
     state.selectedPixels.filter((pixelId) => pixelId.name == name);
@@ -142,11 +143,12 @@ function App() {
 
   return (
     <div className="App">
-      <AppContext.Provider value={{ dispatch, getColor, getSelectedPixels }}>
+      <AppContext.Provider value={{ dispatch, getColor, getColorFromSelectedPallet, getSelectedPixels }}>
         <Sprite sprite={spriteModel} spriteEventHandler={spriteEventHandler} />
         <Pallet
           pallet={selectedPallet}
           selectedColorIndex={state.selectedColorIndex}
+          selectedPalletIndex={state.selectedPalletIndex}
         />
         <ControlPanel state={state} />
       </AppContext.Provider>
