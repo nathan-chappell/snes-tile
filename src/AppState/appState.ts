@@ -1,8 +1,10 @@
 import { off } from "process";
+import { act } from "react-dom/test-utils";
 import { Color, Pallet } from "../Pallet/palletModel";
 import { SpriteSize } from "../Sprite/spriteModel";
 import { cloneTile, PixelId, TileModel } from "../Tile/tileModel";
-import { parseState } from "../VRam/snes9xStateParser";
+import { parseObjPallets } from "../VRam/Parsing/parsePallet";
+import { parseState, Snes9xState } from "../VRam/snes9xStateParser";
 import { Action } from "./actions";
 
 export type SpriteSizes = [8, 16] | [8, 32] | [8, 64] | [16, 32] | [16, 64] | [32, 64];
@@ -14,13 +16,16 @@ export interface AppState {
   name: number;
   nameBase: number;
   pallets: Pallet[];
+  ppuPalletParseOffset: number;
+  // ppuBytes: Uint8Array;
   selectedColorIndex: number;
   selectedPalletIndex: number;
   selectedPixels: PixelId[];
+  snes9xState: Snes9xState;
   spriteSize: SpriteSizes;
   spriteSizeSelect: 0 | 1;
-  tiles: TileModel[];
   stateBytes: Uint8Array;
+  tiles: TileModel[];
 }
 
 const getCurrentTiles: (state: AppState) => [number, TileModel][] = ({ spriteSize, spriteSizeSelect, tiles, name }) => {
@@ -165,11 +170,28 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (s
         selectedPixels: action.payload,
       };
 
+    case "set-snes9xState":
+      return {
+        ...state,
+        snes9xState: action.payload,
+      };
+
     case "set-pallets":
       return {
         ...state,
         pallets: action.payload,
       };
+
+    case "set-ppu-pallet-parse-offset": {
+      debugger;
+      const ppuPalletParseOffset = action.payload;
+      const pallets = parseObjPallets(state.snes9xState.PPU, ppuPalletParseOffset);
+      return {
+        ...state,
+        pallets: pallets.result,
+        ppuPalletParseOffset,
+      };
+    }
 
     case "set-tiles":
       return {

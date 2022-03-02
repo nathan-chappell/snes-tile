@@ -1,5 +1,6 @@
 import { Color, Pallet } from "../Pallet/palletModel";
 import { PixelId, TileModel } from "../Tile/tileModel";
+import { Snes9xState } from "../VRam/snes9xStateParser";
 import { SpriteSizes } from "./appState";
 
 export interface DeselectPixelAction {
@@ -53,6 +54,16 @@ export interface SetPalletsAction {
 export interface SelectPixelAction {
   type: "select-pixel" | "select-another-pixel";
   payload: PixelId[];
+}
+
+export interface SetPPUPalletParseOffset {
+  type: "set-ppu-pallet-parse-offset";
+  payload: number;
+
+}
+export interface SetSnes9xStateAction {
+  type: "set-snes9xState";
+  payload: Snes9xState;
 }
 
 export interface SetTilesAction {
@@ -117,6 +128,8 @@ export type Action =
   | SelectPalletAction
   | SelectPixelAction
   | SetPalletsAction
+  | SetPPUPalletParseOffset
+  | SetSnes9xStateAction
   | SetTilesAction
   | SetStateBytesAction
   | SpriteSizeSelectAction

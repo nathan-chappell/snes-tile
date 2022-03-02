@@ -37,15 +37,20 @@ export const PPUStructName2FieldsMap: {[name in PPUStructTypeName]: PrimitiveFie
 
 export const PPUFields: PPUField[] = [
   { name: "VMA", type: "VMA" },
+  
   { name: "WRAM", type: "uint32" },
+  
   { name: "BG", arrayType: "BG", length: 4 },
+  
   { name: "BGMode", type: "uint8" },
   { name: "BG3Priority", type: "uint8" },
+  
   { name: "CGFLIP", type: "bool8" },
   { name: "CGFLIPRead", type: "uint8" },
   { name: "CGADD", type: "uint8" },
-  { name: "CGSavedByte", type: "uint8" },
-  { name: "CGDATA", arrayType: "uint16", length: 256 },
+  // { name: "CGSavedByte", type: "uint8" },
+  { name: "CGDATA", arrayType: "uint8", length: 256 },
+
   { name: "SOBJ", arrayType: "SOBJ", length: 128 },
   { name: "OBJThroughMain", type: "bool8" },
   { name: "OBJThroughSub", type: "bool8" },
@@ -53,6 +58,7 @@ export const PPUFields: PPUField[] = [
   { name: "OBJNameBase", type: "uint16" },
   { name: "OBJNameSelect", type: "uint16" },
   { name: "OBJSizeSelect", type: "uint8" },
+  
   { name: "OAMAddr", type: "uint16" },
   { name: "SavedOAMAddr", type: "uint16" },
   { name: "OAMPriorityRotation", type: "uint8" },
@@ -61,15 +67,18 @@ export const PPUFields: PPUField[] = [
   { name: "OAMTileAddress", type: "uint16" },
   { name: "OAMWriteRegister", type: "uint16" },
   { name: "OAMData", arrayType: "uint8", length: 512 + 32 },
+
   { name: "FirstSprite", type: "uint8" },
   { name: "LastSprite", type: "uint8" },
   { name: "RangeTimeOver", type: "uint8" },
+
   { name: "HTimerEnabled", type: "bool8" },
   { name: "VTimerEnabled", type: "bool8" },
   { name: "HTimerPosition", type: "short" },
   { name: "VTimerPosition", type: "short" },
   { name: "IRQHBeamPos", type: "uint16" },
   { name: "IRQVBeamPos", type: "uint16" },
+
   { name: "HBeamFlip", type: "uint8" },
   { name: "VBeamFlip", type: "uint8" },
   { name: "HBeamPosLatched", type: "uint16" },
@@ -77,6 +86,7 @@ export const PPUFields: PPUField[] = [
   { name: "GunHLatch", type: "uint16" },
   { name: "GunVLatch", type: "uint16" },
   { name: "HVBeamCounterLatched", type: "uint8" },
+
   { name: "Mode7HFlip", type: "bool8" },
   { name: "Mode7VFlip", type: "bool8" },
   { name: "Mode7Repeat", type: "uint8" },
@@ -88,9 +98,11 @@ export const PPUFields: PPUField[] = [
   { name: "CentreY", type: "short" },
   { name: "M7HOFS", type: "short" },
   { name: "M7VOFS", type: "short" },
+
   { name: "Mosaic", type: "uint8" },
   { name: "MosaicStart", type: "uint8" },
   { name: "BGMosaic", arrayType: "bool8", length: 4 },
+
   { name: "Window1Left", type: "uint8" },
   { name: "Window1Right", type: "uint8" },
   { name: "Window2Left", type: "uint8" },
@@ -102,18 +114,24 @@ export const PPUFields: PPUField[] = [
   { name: "ClipWindow2Enable", arrayType: "uint8", length: 6 },
   { name: "ClipWindow1Inside", arrayType: "bool8", length: 6 },
   { name: "ClipWindow2Inside", arrayType: "bool8", length: 6 },
+
   { name: "ForcedBlanking", type: "bool8" },
+
   { name: "FixedColourRed", type: "uint8" },
   { name: "FixedColourGreen", type: "uint8" },
   { name: "FixedColourBlue", type: "uint8" },
   { name: "Brightness", type: "uint8" },
   { name: "ScreenHeight", type: "uint16" },
+
   { name: "Need16x8Mulitply", type: "bool8" },
   { name: "BGnxOFSbyte", type: "uint8" },
   { name: "M7byte", type: "uint8" },
+
   { name: "HDMA", type: "uint8" },
   { name: "HDMAEnded", type: "uint8" },
+
   { name: "OpenBus1", type: "uint8" },
   { name: "OpenBus2", type: "uint8" },
+
   { name: "VRAMReadBuffer", type: "uint16" },
 ];

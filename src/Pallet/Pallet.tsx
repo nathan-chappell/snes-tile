@@ -7,18 +7,26 @@ export interface PalletProps {
   pallet: PalletT;
   selectedColorIndex: number;
   selectedPalletIndex: number;
+  ppuPalletParseOffset: number;
 }
 
-export const Pallet = ({ pallet, selectedColorIndex, selectedPalletIndex }: PalletProps) => {
+export const Pallet = ({ pallet, selectedColorIndex, selectedPalletIndex, ppuPalletParseOffset }: PalletProps) => {
   let { dispatch } = useContext(AppContext);
 
   const onPalletIndexChange = (e: ChangeEvent<HTMLInputElement>) => {
     dispatch({type: "select-pallet", payload: e.target.valueAsNumber });
   }
 
+  const onPPUPalletParseOffsetChange = (e: ChangeEvent<HTMLInputElement>) => {
+    dispatch({type: "set-ppu-pallet-parse-offset", payload: e.target.valueAsNumber });
+  }
+
   return (
     <div className="pallet">
-      <input type="number" min="0" max="7" step="1" onChange={onPalletIndexChange} value={selectedPalletIndex} />
+      <label label-for="pallet-index">Pallet Index</label>
+      <input name="pallet-index" type="number" min="0" max="7" step="1" onChange={onPalletIndexChange} value={selectedPalletIndex} />
+      <label label-for="ppu-pallet-parse-offset">PPU Pallet Parse Offset</label>
+      <input name="ppu-pallet-parse-offset" type="number" min="0" max="2000" step="1" onChange={onPPUPalletParseOffsetChange} value={ppuPalletParseOffset} />
       {pallet.map((color, colorIndex) => (
         <div
           key={colorIndex}

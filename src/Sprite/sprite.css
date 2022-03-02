@@ -36,10 +36,11 @@ div.sprite {
 }
 
 .sprite-64 {
-  width: 2400px;
+  /* width: 2400px; */
+  width: 300px;
   margin: 4px;
   padding: 16px;
-  grid-template:
+  /* grid-template:
     "tile0  tile1  tile2  tile3  tile4  tile5  tile6  tile7" 274px
     "tile16  tile17  tile18  tile19  tile20  tile21  tile22  tile23" 274px
     "tile32  tile33  tile34  tile35  tile36  tile37  tile38  tile39" 274px
@@ -47,5 +48,14 @@ div.sprite {
     "tile64  tile65  tile66  tile67  tile68  tile69  tile70  tile71" 274px
     "tile80  tile81  tile82  tile83  tile84  tile85  tile86  tile87" 274px
     "tile96  tile97  tile98  tile99  tile100  tile101  tile102  tile103" 274px
-    "tile112  tile113  tile114  tile115  tile116  tile117  tile118  tile119" 274px / 274px 274px 274px 274px 274px 274px 274px 274px;
+    "tile112  tile113  tile114  tile115  tile116  tile117  tile118  tile119" 274px / 274px 274px 274px 274px 274px 274px 274px 274px; */
+    grid-template:
+    "tile0  tile1  tile2  tile3  tile4  tile5  tile6  tile7" 82px
+    "tile16  tile17  tile18  tile19  tile20  tile21  tile22  tile23" 82px
+    "tile32  tile33  tile34  tile35  tile36  tile37  tile38  tile39" 82px
+    "tile48  tile49  tile50  tile51  tile52  tile53  tile54  tile55" 82px
+    "tile64  tile65  tile66  tile67  tile68  tile69  tile70  tile71" 82px
+    "tile80  tile81  tile82  tile83  tile84  tile85  tile86  tile87" 82px
+    "tile96  tile97  tile98  tile99  tile100  tile101  tile102  tile103" 82px
+    "tile112  tile113  tile114  tile115  tile116  tile117  tile118  tile119" 82px / 82px 82px 82px 82px 82px 82px 82px 82px;
 }

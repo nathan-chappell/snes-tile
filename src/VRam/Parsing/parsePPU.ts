@@ -101,6 +101,7 @@ export const parsePPU: (buffer: Uint8Array, offset: number) => PPU = (buffer, of
       offset = parseResult.offset;
       (result as any)[field.name] = parseResult.result;
     } else if (isPrimitiveArrayField(field)) {
+      console.log(offset, field);
       let arrayValue: number[] = [];
       for (let i = 0; i < field.length; ++i) {
         const parseResult = parsePrimitiveField(buffer, offset, field.arrayType);

@@ -26,13 +26,21 @@ export const LoadFromSaveState = ({ nameBase }: LoadFromSaveStateProps) => {
             const stateBytes = new Uint8Array(buffer);
             const state = parseState(stateBytes, 0, nameBase); 
             dispatch({
+              type: "set-snes9xState",
+              payload: state.snes9xState,
+            });
+            dispatch({
+              type: "set-ppu-pallet-parse-offset",
+              payload: 64,
+            });
+            dispatch({
               type: "load-tiles",
               payload: state.tiles,
             });
-            dispatch({
-              type: "set-pallets",
-              payload: state.pallets,
-            });
+            // dispatch({
+            //   type: "set-pallets",
+            //   payload: state.pallets,
+            // });
             dispatch({
               type: "set-state-bytes",
               payload: stateBytes,

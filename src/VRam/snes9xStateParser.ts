@@ -38,10 +38,7 @@ export interface FieldHeader {
   length: number;
 }
 
-const parseFieldHeader: (a: Uint8Array, offset: number) => FieldHeader = (
-  a,
-  offset
-) => ({
+const parseFieldHeader: (a: Uint8Array, offset: number) => FieldHeader = (a, offset) => ({
   name: uint8ArraySubstring(a, offset, 3),
   length: parseInt(uint8ArraySubstring(a, offset + 4, 6)),
 });
@@ -71,24 +68,20 @@ interface ParseStateResult {
   snes9xState: Snes9xState;
   tiles: TileModel[];
   ppu: PPU;
-  pallets: Pallet[];
+  ppuBytes: Uint8Array;
+  // pallets: Pallet[];
 }
 
-const number16Array2Uint8Array: (a: number[]) => Uint8Array
-  = (a) => {
-    const result = new Uint8Array(a.length * 2);
-    for (let i = 0; i < a.length; ++i) {
-      result[2*i] = a[i] & 0xFF;
-      result[2*i + 1] = a[i] >> 8;
-    }
-    return result;
+const number16Array2Uint8Array: (a: number[]) => Uint8Array = (a) => {
+  const result = new Uint8Array(a.length * 2);
+  for (let i = 0; i < a.length; ++i) {
+    result[2 * i] = a[i] & 0xff;
+    result[2 * i + 1] = a[i] >> 8;
   }
+  return result;
+};
 
-export const parseState: (
-  buffer?: Uint8Array,
-  offset?: number,
-  nameBase?: number
-) => ParseStateResult = (
+export const parseState: (buffer?: Uint8Array, offset?: number, nameBase?: number) => ParseStateResult = (
   buffer = btoUint8Array(stateJson.state),
   offset = 0,
   nameBase = 0
@@ -103,11 +96,7 @@ export const parseState: (
     console.log(name, length);
     snes9xStateGatherer = {
       ...snes9xStateGatherer,
-      [name]: new Uint8Array(
-        buffer.buffer,
-        offset + FIELD_HEADER_LENGTH,
-        length
-      ),
+      [name]: new Uint8Array(buffer.buffer, offset + FIELD_HEADER_LENGTH, length),
     };
     offset += FIELD_HEADER_LENGTH + length;
   }
@@ -115,16 +104,23 @@ export const parseState: (
   const ppu = parsePPU(snes9xState.PPU as Uint8Array, 0);
   const objVramOffset = (ppu.OBJNameBase << 13) + (ppu.OBJNameSelect << 12);
   const tilesParseResult = parseTiles(
-    (snes9xState).VRA,
+    snes9xState.VRA,
     nameBase
     // objVramOffset + 550 * 32//  + 890 * 32
   );
-  const palletsParseResult = parseObjPallets(number16Array2Uint8Array(ppu.CGDATA), 256);
+  // const palletsParseResult = parseObjPallets(number16Array2Uint8Array(ppu.CGDATA), 256);
+  // const palletsParseResult = parseObjPallets(Uint8Array.from(ppu.CGDATA), 0);
   console.log(snes9xState);
   console.log(ppu);
   console.log("objVramOffset: 0x" + objVramOffset.toString(16));
   console.log(tilesParseResult);
-  return { snes9xState: snes9xState, tiles: tilesParseResult.result, ppu, pallets: palletsParseResult.result };
+  return {
+    snes9xState: snes9xState,
+    tiles: tilesParseResult.result,
+    ppu,
+    ppuBytes: snes9xState.PPU,
+    // pallets: palletsParseResult.result,
+  };
 };
 
 export const printState = () => {
