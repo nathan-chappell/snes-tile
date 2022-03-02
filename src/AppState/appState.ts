@@ -26,7 +26,7 @@ export interface AppState {
   spriteSize: SpriteSizes;
   spriteSizeSelect: 0 | 1;
   tiles: TileModel[];
-  vram: Uint8Array;
+  stateBytes: Uint8Array;
 }
 
 const getCurrentTiles: (state: AppState) => [number, TileModel][] = ({
@@ -154,7 +154,7 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (
       return {
         ...state,
         nameBase: action.payload,
-        tiles: parseState(state.vram, 0, action.payload).tiles,
+        tiles: parseState(state.stateBytes, 0, action.payload).tiles,
       };
 
     case "select-pallet": {
@@ -176,10 +176,12 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (
       return {
         ...state,
         selectedPixels: action.payload,
-        // selectedPixels: {
-        //   ...state.selectedPixels,
-        //   [action.payload.name]: action.payload.selectedPixels,
-        // },
+      };
+
+    case "set-pallets":
+      return {
+        ...state,
+        pallets: action.payload,
       };
 
     case "set-tiles":
@@ -188,10 +190,10 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (
         tiles: action.payload,
       };
 
-    case "set-vram":
+    case "set-state-bytes":
       return {
         ...state,
-        vram: action.payload,
+        stateBytes: action.payload,
       };
 
     case "sprite-size-select":
@@ -199,7 +201,6 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (
         ...state,
         spriteSizeSelect: action.payload,
       };
-      break;
 
     case "update-pallet": {
       const { colorIndex, rgbIndex, value } = action.payload;

@@ -1,4 +1,6 @@
+import { Pallet } from "../Pallet/palletModel";
 import { TileModel } from "../Tile/tileModel";
+import { parseObjPallets } from "./Parsing/parsePallet";
 import { parsePPU } from "./Parsing/parsePPU";
 import { parseTiles } from "./Parsing/parseTile";
 import { PPU } from "./ppu";
@@ -69,7 +71,18 @@ interface ParseStateResult {
   snes9xState: Snes9xState;
   tiles: TileModel[];
   ppu: PPU;
+  pallets: Pallet[];
 }
+
+const number16Array2Uint8Array: (a: number[]) => Uint8Array
+  = (a) => {
+    const result = new Uint8Array(a.length * 2);
+    for (let i = 0; i < a.length; ++i) {
+      result[2*i] = a[i] & 0xFF;
+      result[2*i + 1] = a[i] >> 8;
+    }
+    return result;
+  }
 
 export const parseState: (
   buffer?: Uint8Array,
@@ -80,16 +93,16 @@ export const parseState: (
   offset = 0,
   nameBase = 0
 ) => {
-  let snes9xState: any = {};
+  let snes9xStateGatherer: any = {};
   const magic = uint8ArraySubstring(buffer, offset, MAGIC_NUMBER_LENGTH);
   console.log(magic);
-  snes9xState = { ...snes9xState, magic };
+  snes9xStateGatherer = { ...snes9xStateGatherer, magic };
   offset += FIELDS_OFFSET;
   while (offset < buffer.length) {
     const { name, length } = parseFieldHeader(buffer, offset);
     console.log(name, length);
-    snes9xState = {
-      ...snes9xState,
+    snes9xStateGatherer = {
+      ...snes9xStateGatherer,
       [name]: new Uint8Array(
         buffer.buffer,
         offset + FIELD_HEADER_LENGTH,
@@ -98,18 +111,20 @@ export const parseState: (
     };
     offset += FIELD_HEADER_LENGTH + length;
   }
-  console.log(snes9xState);
+  const snes9xState = snes9xStateGatherer as Snes9xState;
   const ppu = parsePPU(snes9xState.PPU as Uint8Array, 0);
-  console.log(ppu);
   const objVramOffset = (ppu.OBJNameBase << 13) + (ppu.OBJNameSelect << 12);
-  console.log("objVramOffset: 0x" + objVramOffset.toString(16));
   const tilesParseResult = parseTiles(
-    (snes9xState as Snes9xState).VRA,
+    (snes9xState).VRA,
     nameBase
     // objVramOffset + 550 * 32//  + 890 * 32
   );
+  const palletsParseResult = parseObjPallets(number16Array2Uint8Array(ppu.CGDATA), 256);
+  console.log(snes9xState);
+  console.log(ppu);
+  console.log("objVramOffset: 0x" + objVramOffset.toString(16));
   console.log(tilesParseResult);
-  return { snes9xState, tiles: tilesParseResult.result, ppu };
+  return { snes9xState: snes9xState, tiles: tilesParseResult.result, ppu, pallets: palletsParseResult.result };
 };
 
 export const printState = () => {

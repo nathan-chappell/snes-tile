@@ -1,4 +1,4 @@
-import { Color } from "../Pallet/palletModel";
+import { Color, Pallet } from "../Pallet/palletModel";
 import { PixelId, TileModel } from "../Tile/tileModel";
 import { SpriteSizes } from "./appState";
 
@@ -45,6 +45,11 @@ export interface SelectPalletAction {
   payload: SelectPalletPayload;
 }
 
+export interface SetPalletsAction {
+  type: "set-pallets";
+  payload: Pallet[];
+}
+
 export interface SelectPixelAction {
   type: "select-pixel" | "select-another-pixel";
   payload: PixelId[];
@@ -55,8 +60,8 @@ export interface SetTilesAction {
   payload: TileModel[];
 }
 
-export interface SetVramAction {
-  type: "set-vram";
+export interface SetStateBytesAction {
+  type: "set-state-bytes";
   payload: Uint8Array;
 }
 
@@ -111,8 +116,9 @@ export type Action =
   | SelectNameBaseAction
   | SelectPalletAction
   | SelectPixelAction
+  | SetPalletsAction
   | SetTilesAction
-  | SetVramAction
+  | SetStateBytesAction
   | SpriteSizeSelectAction
   | UpdatePalletAction
   | UpdatePalletColorAction

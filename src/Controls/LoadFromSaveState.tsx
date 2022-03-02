@@ -23,14 +23,19 @@ export const LoadFromSaveState = ({ nameBase }: LoadFromSaveStateProps) => {
         onChange={(e) =>
           (e.target.files ?? [])[0]?.arrayBuffer().then((buffer) =>
           {
-            const vram = new Uint8Array(buffer);
+            const stateBytes = new Uint8Array(buffer);
+            const state = parseState(stateBytes, 0, nameBase); 
             dispatch({
               type: "load-tiles",
-              payload: parseState(vram, 0, nameBase).tiles,
+              payload: state.tiles,
             });
             dispatch({
-              type: "set-vram",
-              payload: vram,
+              type: "set-pallets",
+              payload: state.pallets,
+            });
+            dispatch({
+              type: "set-state-bytes",
+              payload: stateBytes,
             });
           }
           )

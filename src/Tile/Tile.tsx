@@ -40,7 +40,6 @@ export const Tile = ({
             type: "pixel",
             payload: pixelId,
           });
-
   return (
     <div grid-area={`tile${name}`} >
       <table className="tile" tabIndex={2}>

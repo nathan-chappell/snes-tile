@@ -30,7 +30,7 @@ const initialState: AppState = {
   spriteSizeSelect: 1,
   // tiles: [...Array(64 * 64)].map(() => makeDefaultTile()),
   tiles: [],
-  vram: new Uint8Array(),
+  stateBytes: new Uint8Array(),
 };
 
 const savedState: AppState = JSON.parse(
@@ -89,13 +89,16 @@ function App() {
   if (state.tiles.length === 0) {
     const parseStateResult = parseState();
     dispatch({ type: "set-tiles", payload: parseStateResult.tiles });
+    dispatch({ type: "set-pallets", payload: parseStateResult.pallets });
     return <div>Loading Tiles</div>
   }
 
   const selectedTile = state.tiles[state.name];
   const selectedPallet = state.pallets[selectedTile.palletIndex];
-  const getColor = (palletIndex: number, colorIndex: number) =>
-    state.pallets[palletIndex][colorIndex];
+  const getColor = (palletIndex: number, colorIndex: number) => {
+    let result = state.pallets[palletIndex][colorIndex];
+    return result;
+  }
 
   const getSelectedPixels = (name: number) =>
     state.selectedPixels.filter((pixelId) => pixelId.name == name);
