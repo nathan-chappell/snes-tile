@@ -23,6 +23,7 @@ export interface AppState {
   nameBase: number;
   pallets: Pallet[];
   ppuPalletParseOffset: number;
+  ppuFixedColor: number;
   // ppuBytes: Uint8Array;
   selectedColorIndex: number;
   selectedPalletIndex: number;

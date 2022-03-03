@@ -8,7 +8,7 @@ import React, {
 import "./App.css";
 import { AppState, appStateReducer } from "./AppState/appState";
 import { AppContext } from "./AppState/appStateContext";
-import { makeDefaultPallet } from "./Pallet/palletModel";
+import { Color, makeDefaultPallet } from "./Pallet/palletModel";
 import { Pallet } from "./Pallet/Pallet";
 import { Tile } from "./Tile/Tile";
 import { makeDefaultTile, PixelId } from "./Tile/tileModel";
@@ -26,11 +26,12 @@ const localStorageKey = "snes-tile-state";
 
 const initialState: AppState = {
   drawingState: "none",
-  name: 0,
+  name: 1502,
   nameBase: 0,
   pallets: [...Array(8)].map(() => makeDefaultPallet()),
-  ppuPalletParseOffset: 64,
-  selectedPalletIndex: 0,
+  ppuPalletParseOffset: 64 + 256,
+  ppuFixedColor: 29587,
+  selectedPalletIndex: 4,
   selectedColorIndex: 1,
   selectedPixels: [],
   snes9xState: null as any,
@@ -99,7 +100,6 @@ function App() {
 
   useEffect(() => {
     new Promise<void>((res) => res()).then(() => {
-      debugger;
       const parseStateResult = parseState();
       dispatch({ type: "set-tiles", payload: parseStateResult.tiles });
       dispatch({
@@ -122,7 +122,12 @@ function App() {
   const selectedPallet = state.pallets[state.selectedPalletIndex];
   const getColor = (palletIndex: number, colorIndex: number) => {
     let result = state.pallets[palletIndex][colorIndex];
+    const fixedR = state.ppuFixedColor & 0x1f;
+    const fixedG = (state.ppuFixedColor >> 5) & 0x1f;
+    const fixedB = (state.ppuFixedColor >> 10) & 0x1f;
     return result;
+    // return [result[0] + fixedR, result[1] + fixedG, result[1] + fixedB] as Color;
+    // return [result[0] - fixedR, result[1] - fixedG, result[1] - fixedB] as Color;
   };
   const getColorFromSelectedPallet = (colorIndex: number) =>
     getColor(state.selectedPalletIndex, colorIndex);
