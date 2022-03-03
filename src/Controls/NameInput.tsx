@@ -23,7 +23,7 @@ export const NameInput = ({ name, nameBase }: NameInputProps) => {
         onChange={(e) =>
           dispatch({
             type: "select-name",
-            payload: e.target.valueAsNumber,
+            payload: { absolute: e.target.valueAsNumber },
           })
         }
       />
@@ -40,7 +40,7 @@ export const NameInput = ({ name, nameBase }: NameInputProps) => {
         onChange={(e) =>
           dispatch({
             type: "select-name-base",
-            payload: e.target.valueAsNumber,
+            payload: { absolute: e.target.valueAsNumber },
           })
         }
       />

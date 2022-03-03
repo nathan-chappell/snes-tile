@@ -3,6 +3,11 @@ import { PixelId, TileModel } from "../Tile/tileModel";
 import { Snes9xState } from "../VRam/snes9xStateParser";
 import { SpriteSizes } from "./appState";
 
+export interface AbsoluteOrOffset {
+  absolute?: number;
+  offset?: number;
+}
+
 export interface DeselectPixelAction {
   type: "deselect-pixel";
   payload: null;
@@ -31,12 +36,12 @@ export interface SelectColorAction {
 
 export interface SelectNameAction {
   type: "select-name";
-  payload: number;
+  payload: AbsoluteOrOffset;
 }
 
 export interface SelectNameBaseAction {
   type: "select-name-base";
-  payload: number;
+  payload: AbsoluteOrOffset;
 }
 
 export type SelectPalletPayload = number;

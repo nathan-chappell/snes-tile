@@ -48,8 +48,8 @@ export const PPUFields: PPUField[] = [
   { name: "CGFLIP", type: "bool8" },
   { name: "CGFLIPRead", type: "uint8" },
   { name: "CGADD", type: "uint8" },
-  // { name: "CGSavedByte", type: "uint8" },
-  { name: "CGDATA", arrayType: "uint8", length: 256 },
+  { name: "CGSavedByte", type: "uint8" },
+  { name: "CGDATA", arrayType: "uint8", length: 512 },
 
   { name: "SOBJ", arrayType: "SOBJ", length: 128 },
   { name: "OBJThroughMain", type: "bool8" },

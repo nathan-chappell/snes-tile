@@ -6,7 +6,8 @@ import { parseTiles } from "./Parsing/parseTile";
 import { PPU } from "./ppu";
 
 // let stateJson = require("./smw.state3.json");
-let stateJson = require("./super_metroid.state18.json");
+// let stateJson = require("./super_metroid.state18.json");
+let stateJson = require("./TestData/smw.state21.json");
 
 const btoUint8Array = (b64: string) => {
   const s = atob(b64);

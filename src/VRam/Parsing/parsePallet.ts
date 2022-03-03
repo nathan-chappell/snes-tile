@@ -3,13 +3,20 @@ import { Color, Pallet } from "../../Pallet/palletModel";
 import { makeDefaultTile, TileModel } from "../../Tile/tileModel";
 import { ParseResult } from "./parseTypes";
 
+// fixed color add:
+// red: 19
+// green: 28
+// blue: 28
+// 
+// pallet 4 at offset 70 ??
+
 export const parseObjColor: (buffer: Uint8Array, offset: number) => ParseResult<Color> = (buffer, offset) => {
-  let val = buffer[offset] + (buffer[offset + 1] << 8);
+  let val = buffer[offset + 1] + (buffer[offset] << 8);
 
   let r = val & 0x1f;
   let g = (val >> 5) & 0x1f;
   let b = (val >> 10) & 0x1f;
-  return { result: [r, g, b], offset: offset + 4 };
+  return { result: [r, g, b], offset: offset + 2 };
   //   return { result: [32 - r, 32 - g, 32 - b], offset: offset + 2 };
 };
 

@@ -7,7 +7,13 @@ import { parseObjPallets } from "../VRam/Parsing/parsePallet";
 import { parseState, Snes9xState } from "../VRam/snes9xStateParser";
 import { Action } from "./actions";
 
-export type SpriteSizes = [8, 16] | [8, 32] | [8, 64] | [16, 32] | [16, 64] | [32, 64];
+export type SpriteSizes =
+  | [8, 16]
+  | [8, 32]
+  | [8, 64]
+  | [16, 32]
+  | [16, 64]
+  | [32, 64];
 
 export type DrawingState = "none" | "drawing" | "erasing";
 
@@ -28,7 +34,12 @@ export interface AppState {
   tiles: TileModel[];
 }
 
-const getCurrentTiles: (state: AppState) => [number, TileModel][] = ({ spriteSize, spriteSizeSelect, tiles, name }) => {
+const getCurrentTiles: (state: AppState) => [number, TileModel][] = ({
+  spriteSize,
+  spriteSizeSelect,
+  tiles,
+  name,
+}) => {
   const dotsPerTile = spriteSize[spriteSizeSelect];
   let result: [number, TileModel][] = [];
   for (let i = 0; i < dotsPerTile / 8; ++i) {
@@ -47,7 +58,11 @@ const getPixelsForCurrentPallet: (state: AppState) => PixelId[] = (state) => {
     if (tiles[name].palletIndex != selectedPalletIndex) continue;
 
     for (let rowIndex = 0; rowIndex < tiles[name].pixels.length; ++rowIndex) {
-      for (let columnIndex = 0; columnIndex < tiles[name].pixels.length; ++columnIndex) {
+      for (
+        let columnIndex = 0;
+        columnIndex < tiles[name].pixels.length;
+        ++columnIndex
+      ) {
         if (tiles[name].pixels[rowIndex][columnIndex] == selectedColorIndex) {
           selectedPixels.push({ name, rowIndex, columnIndex });
         }
@@ -63,7 +78,10 @@ const updatePallet = (pallet: Pallet, colorIndex: number, color: Color) => [
   ...pallet.slice(colorIndex + 1),
 ];
 
-export const appStateReducer: (state: AppState, action: Action) => AppState = (state, action) => {
+export const appStateReducer: (state: AppState, action: Action) => AppState = (
+  state,
+  action
+) => {
   switch (action.type) {
     case "deselect-pixel":
       return {
@@ -130,18 +148,21 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (s
           ],
         },
       };*/
-    case "select-name":
+    case "select-name": {
+      const newName = action.payload.absolute ?? (state.name + action.payload.offset!);
       return {
         ...state,
-        name: action.payload,
+        name: Math.max(0, newName),
       };
+    }
 
-    case "select-name-base":
+    case "select-name-base":{
+      const newNameBase = action.payload.absolute ?? (state.name + action.payload.offset!);
       return {
         ...state,
-        nameBase: action.payload,
-        tiles: parseState(state.stateBytes, 0, action.payload).tiles,
+        nameBase: Math.max(0, newNameBase),
       };
+    }
 
     case "select-color": {
       const nextState = { ...state, selectedColorIndex: action.payload };
@@ -161,7 +182,7 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (s
     case "select-pallet":
       return {
         ...state,
-        selectedPalletIndex: action.payload,
+        selectedPalletIndex: Math.max(0, action.payload ?? 0),
       };
 
     case "select-pixel":
@@ -183,9 +204,11 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (s
       };
 
     case "set-ppu-pallet-parse-offset": {
-      debugger;
       const ppuPalletParseOffset = action.payload;
-      const pallets = parseObjPallets(state.snes9xState.PPU, ppuPalletParseOffset);
+      const pallets = parseObjPallets(
+        state.snes9xState.PPU,
+        ppuPalletParseOffset
+      );
       return {
         ...state,
         pallets: pallets.result,
