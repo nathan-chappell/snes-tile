@@ -7,7 +7,8 @@ import { PPU } from "./ppu";
 
 // let stateJson = require("./smw.state3.json");
 // let stateJson = require("./super_metroid.state18.json");
-let stateJson = require("./TestData/smw.state21.json");
+// let stateJson = require("./TestData/smw.state21.json");
+let stateJson = require("./TestData/kirby.001.json");
 
 const btoUint8Array = (b64: string) => {
   const s = atob(b64);
@@ -52,6 +53,7 @@ const PPU_OAM_OFFST = 0;
 export interface Snes9xState {
   magic: string;
   NAM: Uint8Array;
+  COL: Uint8Array;
   CPU: Uint8Array;
   REG: Uint8Array;
   PPU: Uint8Array;

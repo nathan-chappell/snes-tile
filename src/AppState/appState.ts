@@ -206,9 +206,13 @@ export const appStateReducer: (state: AppState, action: Action) => AppState = (
 
     case "set-ppu-pallet-parse-offset": {
       const ppuPalletParseOffset = action.payload;
+      // const pallets = parseObjPallets(
+      //   state.snes9xState.PPU,
+      //   ppuPalletParseOffset
+      // );
       const pallets = parseObjPallets(
-        state.snes9xState.PPU,
-        ppuPalletParseOffset
+        state.snes9xState.COL,
+        256
       );
       return {
         ...state,

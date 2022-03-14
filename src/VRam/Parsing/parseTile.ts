@@ -20,8 +20,8 @@ export const parseTile: (buffer: Uint8Array, offset: number) => ParseResult<Tile
         const bp3 = parseBitPlane(buffer, offset + 17);
         for (let x = 0; x < 8; ++x) {
             for (let y = 0; y < 8; ++y) {
-                result.pixels[y][x] = (bp0[y][x] << 3) + (bp1[y][x] << 2) + (bp2[y][x] << 1) + (bp3[y][x] << 0)
-                // result.pixels[y][x] = (bp0[y][x] << 0) + (bp1[y][x] << 1) + (bp2[y][x] << 2) + (bp3[y][x] << 3)
+                // result.pixels[y][x] = (bp0[y][x] << 3) + (bp1[y][x] << 2) + (bp2[y][x] << 1) + (bp3[y][x] << 0)
+                result.pixels[y][x] = (bp0[y][x] << 0) + (bp1[y][x] << 1) + (bp2[y][x] << 2) + (bp3[y][x] << 3)
             }
         }
         return { result, offset: offset + 32 };

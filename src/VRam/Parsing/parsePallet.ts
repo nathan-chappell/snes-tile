@@ -12,8 +12,8 @@ import { ParseResult } from "./parseTypes";
 // pallet 4 at offset 70 ??
 
 export const parseObjColor: (buffer: Uint8Array, offset: number) => ParseResult<Color> = (buffer, offset) => {
-  const high = buffer[offset];
-  const low = buffer[offset + 1];
+  const low = buffer[offset];
+  const high = buffer[offset + 1];
   const val = (high << 8) + low;
 
   const r = val & 0x1f;
